@@ -9,7 +9,7 @@ class BleuScore(tf.keras.metrics.Metric):
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         # slice after <eos>
-        print("BleuScore - update_state - y_pred ", y_true)
+        print("BleuScore - update_state - y_true ", y_true)
         print("BleuScore - update_state - y_pred ", y_pred)
         predictions = y_pred.tolist()
         for i in range(len(predictions)):

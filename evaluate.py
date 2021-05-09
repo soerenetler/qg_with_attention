@@ -31,6 +31,7 @@ class QuestionGenerator(tf.keras.Model):
             decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
             pred = self.decoder(dec_input, decoder_initial_state)
             logits = pred.rnn_output
+            pred_token = pred.sample_id
             # Updates the metrics tracking the loss
             loss=self.compiled_loss(real, logits, regularization_losses=self.losses)
 
@@ -39,7 +40,7 @@ class QuestionGenerator(tf.keras.Model):
         gradients = tape.gradient(loss, variables)
 
         self.optimizer.apply_gradients(zip(gradients, variables))
-        self.compiled_metrics.update_state(real, logits)
+        self.compiled_metrics.update_state(real, pred_token)
 
         return {m.name: m.result() for m in self.metrics}
 
