@@ -106,8 +106,8 @@ callbacks = [
 
 EPOCHS = 2
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer, loss=loss_function, metrics=[BleuScore()])
-qg.fit(dataset, epochs=2, callbacks=callbacks, validation_data=dataset_val)
+qg.compile(optimizer=optimizer, loss=loss_function)
+qg.fit(dataset, epochs=2, callbacks=callbacks)
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three', 'album', 'deal', 'with', ',', 'which', 'left', '.'])
 qg.translate(["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capital", "of", "the", "German", "state", "of", "Brandenburg", "."])
@@ -115,4 +115,12 @@ qg.translate("the largest of these is the eldon square shop-ping centre , one of
 
 qg.beam_translate("the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "))
 qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the', 'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
-qg.evaluate(dataset_val)
+
+dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
+result, beam_scores = qg.beam_evaluate_sentences(dev_sentences)
+outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
+
+with open(path_to_model + "demo_val.txt", "a") as f:
+    for output in outputs:
+        f.write(str(output))
+        f.write('\n')
