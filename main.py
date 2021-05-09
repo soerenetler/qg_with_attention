@@ -98,34 +98,7 @@ callbacks = [
 EPOCHS = 2
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer)
-qg.fit(dataset, epochs=2)#, callbacks=callbacks, validation_split=0.2)
-
-# for epoch in range(EPOCHS):
-#   start = time.time()
-
-#   enc_hidden = encoder.initialize_hidden_state()
-#   total_loss = 0
-
-#   for (batch, (inp, targ)) in enumerate(dataset.take(steps_per_epoch)):
-#     batch_loss = qg.train_step(inp, targ, enc_hidden)
-#     total_loss += batch_loss
-
-#     if batch % 100 == 0:
-#       print('Epoch {} Batch {} Loss {:.4f}'.format(epoch + 1,
-#                                                    batch,
-#                                                    batch_loss.numpy()))
-#   # saving (checkpoint) the model every 2 epochs
-#   if (epoch + 1) % 2 == 0:
-#     checkpoint.save(file_prefix = checkpoint_prefix)
-
-#   print('Epoch {} Loss {:.4f}'.format(epoch + 1,
-#                                       total_loss / steps_per_epoch))
-#   print('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
-
-# restoring the latest checkpoint in checkpoint_dir
-#checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
-
-
+qg.fit(dataset, epochs=2, callbacks=callbacks, validation_split=0.2)
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three', 'album', 'deal', 'with', ',', 'which', 'left', '.'])
 qg.translate(["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capital", "of", "the", "German", "state", "of", "Brandenburg", "."])
