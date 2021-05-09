@@ -61,6 +61,10 @@ example_input_batch, example_target_batch = next(iter(dataset))
 print("shape input_batch:", example_input_batch.shape)
 print("shape target_batch:", example_target_batch.shape)
 
+example_input_batch_val, example_target_batch_val = next(iter(dataset_val))
+print("shape input_batch_val:", example_input_batch_val.shape)
+print("shape target_batch_val:", example_target_batch_val.shape)
+
 encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE, bidirectional=False, embedding_matrix=embedding_matrix)
 # sample input
 sample_hidden = encoder.initialize_hidden_state()
