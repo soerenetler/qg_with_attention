@@ -31,6 +31,7 @@ class QuestionGenerator(tf.keras.Model):
             decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
             pred = self.decoder(dec_input, decoder_initial_state)
             print("TRAIN - pred.rnn_output ", pred.rnn_output.shape)
+            print("TRAIN - real ", real)
             logits = pred.rnn_output
             pred_token = pred.sample_id
             # Updates the metrics tracking the loss
@@ -127,6 +128,7 @@ class QuestionGenerator(tf.keras.Model):
         logits = outputs.rnn_output
         pred_token = outputs.sample_id
         print("TEST - outputs.rnn_output ",logits.shape)
+        print("TEST - real ",real)
         # Updates the metrics tracking the loss
         self.compiled_loss(real, logits, regularization_losses=self.losses)
         # Update the metrics.
