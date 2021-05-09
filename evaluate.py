@@ -39,7 +39,7 @@ class QuestionGenerator(tf.keras.Model):
 
         self.optimizer.apply_gradients(zip(gradients, variables))
 
-        return {"loss": loss}
+        return {m.name: m.result() for m in self.metrics}
 
     def evaluate_sentence(self, sentence):
         sentence = self.qg_dataset.preprocess_sentence(sentence)
@@ -108,7 +108,7 @@ class QuestionGenerator(tf.keras.Model):
         logits = pred.rnn_output
         loss = loss_function(real, logits)
 
-        return {"loss": loss}
+        return {m.name: m.result() for m in self.metrics}
 
 
     def beam_evaluate_sentence(self, sentence, beam_width=3):
