@@ -104,7 +104,7 @@ callbacks = [
 
 EPOCHS = 2
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer)
+qg.compile(optimizer=optimizer, loss=loss_function)
 qg.fit(dataset, epochs=2, callbacks=callbacks, validation_data=dataset_val)
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three', 'album', 'deal', 'with', ',', 'which', 'left', '.'])
