@@ -31,7 +31,8 @@ class QuestionGenerator(tf.keras.Model):
             decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
             pred = self.decoder(dec_input, decoder_initial_state)
             logits = pred.rnn_output
-            loss = loss_function(real, logits)
+            # Updates the metrics tracking the loss
+            self.compiled_loss(real, logits, regularization_losses=self.losses)
 
         variables = self.encoder.trainable_variables + self.decoder.trainable_variables
 
@@ -106,7 +107,10 @@ class QuestionGenerator(tf.keras.Model):
         decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
         pred = self.decoder(dec_input, decoder_initial_state)
         logits = pred.rnn_output
-        loss = loss_function(real, logits)
+        # Updates the metrics tracking the loss
+        self.compiled_loss(real, logits, regularization_losses=self.losses)
+        # Update the metrics.
+        self.compiled_metrics.update_state(real, logits)
 
         return {m.name: m.result() for m in self.metrics}
 
