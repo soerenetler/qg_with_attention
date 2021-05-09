@@ -125,11 +125,12 @@ class QuestionGenerator(tf.keras.Model):
 
         outputs, _, _ = decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
         logits = outputs.rnn_output
-        print("TEST - outputs.rnn_output ", logits.shape)
+        pred_token = pred.sample_id
+        print("TEST - outputs.rnn_output ",logits.shape)
         # Updates the metrics tracking the loss
         self.compiled_loss(real, logits, regularization_losses=self.losses)
         # Update the metrics.
-        self.compiled_metrics.update_state(real, logits)
+        self.compiled_metrics.update_state(real, pred_token)
 
         return {m.name: m.result() for m in self.metrics}
 
