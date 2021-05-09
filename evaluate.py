@@ -94,7 +94,7 @@ class QuestionGenerator(tf.keras.Model):
     def beam_evaluate_sentences(self, sentences, beam_width=3):
         sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
 
-        inputs = self.inp_tokenizer.texts_to_sequences([sentences])
+        inputs = self.inp_tokenizer.texts_to_sequences(sentences)
         inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
                                                                 maxlen=self.max_length_inp,
                                                                 padding='post')
