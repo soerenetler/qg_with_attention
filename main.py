@@ -55,7 +55,7 @@ dataset = tf.data.Dataset.from_tensor_slices((input_tensor_train, target_tensor_
 dataset = dataset.batch(BATCH_SIZE, drop_remainder=True)
 
 dataset_val = tf.data.Dataset.from_tensor_slices((input_tensor_dev, target_tensor_dev))
-dataset_val = dataset.batch(BATCH_SIZE, drop_remainder=True)
+dataset_val = dataset_val.batch(BATCH_SIZE, drop_remainder=True)
 
 example_input_batch, example_target_batch = next(iter(dataset))
 print("shape input_batch:", example_input_batch.shape)
