@@ -1,7 +1,10 @@
 from qg_dataset import QGDataset
-from utils import convert, generate_embeddings_matrix
+from utils import convert, generate_embeddings_matrix, loss_function
 from encoder import Encoder
 from decoder import Decoder
+from evaluate import Evaluator
+import os
+import time
 
 import tensorflow as tf
 
@@ -68,3 +71,76 @@ decoder.attention_mechanism.setup_memory(sample_output)
 initial_state = decoder.build_initial_state(BATCH_SIZE, sample_hidden, tf.float32)
 sample_decoder_outputs = decoder(sample_x, initial_state)
 print("Decoder Outputs Shape: ", sample_decoder_outputs.rnn_output.shape)
+
+## Define the optimizer and the loss function
+optimizer = tf.keras.optimizers.Adam()
+
+checkpoint_dir = path_to_model + 'training_checkpoints'
+checkpoint_prefix = os.path.join(checkpoint_dir, "ckpt")
+checkpoint = tf.train.Checkpoint(optimizer=optimizer,
+                                 encoder=encoder,
+                                 decoder=decoder)
+
+## Training
+@tf.function
+def train_step(inp, targ, enc_hidden):
+  loss = 0
+
+  with tf.GradientTape() as tape:
+    enc_output, enc_hidden = encoder(inp, enc_hidden)
+
+    dec_input = targ[ : , :-1 ] # Ignore <end> token
+    real = targ[ : , 1: ]         # ignore <start> token
+
+    # Set the AttentionMechanism object with encoder_outputs
+    decoder.attention_mechanism.setup_memory(enc_output)
+
+    # Create AttentionWrapperState as initial_state for decoder
+    decoder_initial_state = decoder.build_initial_state(BATCH_SIZE,enc_hidden, tf.float32)
+    pred = decoder(dec_input, decoder_initial_state)
+    logits = pred.rnn_output
+    loss = loss_function(real, logits)
+
+  variables = encoder.trainable_variables + decoder.trainable_variables
+
+  gradients = tape.gradient(loss, variables)
+
+  optimizer.apply_gradients(zip(gradients, variables))
+
+  return loss
+
+EPOCHS = 2
+
+for epoch in range(EPOCHS):
+  start = time.time()
+
+  enc_hidden = encoder.initialize_hidden_state()
+  total_loss = 0
+
+  for (batch, (inp, targ)) in enumerate(dataset.take(steps_per_epoch)):
+    batch_loss = train_step(inp, targ, enc_hidden)
+    total_loss += batch_loss
+
+    if batch % 100 == 0:
+      print('Epoch {} Batch {} Loss {:.4f}'.format(epoch + 1,
+                                                   batch,
+                                                   batch_loss.numpy()))
+  # saving (checkpoint) the model every 2 epochs
+  if (epoch + 1) % 2 == 0:
+    checkpoint.save(file_prefix = checkpoint_prefix)
+
+  print('Epoch {} Loss {:.4f}'.format(epoch + 1,
+                                      total_loss / steps_per_epoch))
+  print('Time taken for 1 epoch {} sec\n'.format(time.time() - start))
+
+# restoring the latest checkpoint in checkpoint_dir
+checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+
+
+evaluator = Evaluator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
+evaluator.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three', 'album', 'deal', 'with', ',', 'which', 'left', '.'])
+evaluator.translate(["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capital", "of", "the", "German", "state", "of", "Brandenburg", "."])
+evaluator.translate("the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "))
+
+evaluator.beam_translate("the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "))
+evaluator.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the', 'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
