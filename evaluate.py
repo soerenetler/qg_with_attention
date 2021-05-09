@@ -87,6 +87,15 @@ class QuestionGenerator(tf.keras.Model):
         print('Input: %s' % (sentence))
         print('Predicted translation: {}'.format(result))
 
+    def call(self, data):
+        print("CALL - DATA - ", data)
+        print("CALL - DATA len - ", len(data))
+
+    def test_step(self, data):
+        print("TEST_STEP - DATA - ", data)
+        print("TEST_STEP - DATA len - ", len(data))
+
+
     def beam_evaluate_sentence(self, sentence, beam_width=3):
         sentence = self.qg_dataset.preprocess_sentence(sentence)
 
