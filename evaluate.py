@@ -31,17 +31,15 @@ class QuestionGenerator(tf.keras.Model):
             decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
             pred = self.decoder(dec_input, decoder_initial_state)
             logits = pred.rnn_output
-            # Updates the metrics tracking the loss
-            loss=self.compiled_loss(real, logits, regularization_losses=self.losses)
+            loss = loss_function(real, logits)
 
         variables = self.encoder.trainable_variables + self.decoder.trainable_variables
 
         gradients = tape.gradient(loss, variables)
 
         self.optimizer.apply_gradients(zip(gradients, variables))
-        self.compiled_metrics.update_state(real, logits)
 
-        return {m.name: m.result() for m in self.metrics}
+        return {"loss": loss}
 
     def evaluate_sentence(self, sentence):
         sentence = self.qg_dataset.preprocess_sentence(sentence)
@@ -92,7 +90,8 @@ class QuestionGenerator(tf.keras.Model):
     def test_step(self, data):
         inp, targ = data
         print("test_step - inp shape: ", inp.shape)
-        print("test_step - targ shape: ", targ.shape)
+        print("test_step - inp shape: ", inp.shape)
+        loss = 0
         enc_hidden = self.encoder.initialize_hidden_state()
         
         enc_output, enc_hidden = self.encoder(inp, enc_hidden)
@@ -107,12 +106,9 @@ class QuestionGenerator(tf.keras.Model):
         decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
         pred = self.decoder(dec_input, decoder_initial_state)
         logits = pred.rnn_output
-        # Updates the metrics tracking the loss
-        self.compiled_loss(real, logits, regularization_losses=self.losses)
-        # Update the metrics.
-        self.compiled_metrics.update_state(real, logits)
+        loss = loss_function(real, logits)
 
-        return {m.name: m.result() for m in self.metrics}
+        return {"loss": loss}
 
 
     def beam_evaluate_sentence(self, sentence, beam_width=3):
