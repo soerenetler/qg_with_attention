@@ -9,23 +9,27 @@ class BleuScore(tf.keras.metrics.Metric):
 
     def update_state(self, y_true, y_pred, sample_weight=None):
         # slice after <eos>
-        print("BleuScore - update_state - y_true ", y_true)
-        print("BleuScore - update_state - y_pred ", y_pred)
-        predictions = y_pred.tolist()
-        for i in range(len(predictions)):
-            prediction = predictions[i]
-            if 2 in prediction:  # 2: EOS
-                predictions[i] = prediction[:prediction.index(2)+1]
+        print("BleuScore - update_state - y_true ", y_true.shape)
+        print("BleuScore - update_state - y_pred ", y_pred.shape)
 
-        labels = [
-            [[w_id for w_id in label if w_id != 0]]  # 0: PAD
-            for label in y_true.tolist()]
-        predictions = [
-            [w_id for w_id in prediction]
-            for prediction in predictions]
+        if y_pred.shape[1] == None:
+            self.bleu.assign_add(tf.reduce_mean(float(0)))
+        else:
+            predictions = y_pred.tolist()
+            for i in range(len(predictions)):
+                prediction = predictions[i]
+                if 2 in prediction:  # 2: EOS
+                    predictions[i] = prediction[:prediction.index(2)+1]
 
-        self.bleu.assign_add(tf.reduce_mean(
-            float(nltk.translate.bleu_score.corpus_bleu(labels, predictions))))
+            labels = [
+                [[w_id for w_id in label if w_id != 0]]  # 0: PAD
+                for label in y_true.tolist()]
+            predictions = [
+                [w_id for w_id in prediction]
+                for prediction in predictions]
+
+            self.bleu.assign_add(tf.reduce_mean(
+                float(nltk.translate.bleu_score.corpus_bleu(labels, predictions))))
 
     def result(self):
         return self.bleu * 100
