@@ -14,9 +14,10 @@ class QuestionGenerator(tf.keras.Model):
 
     ## Training
     @tf.function
-    def train_step(self, inp, targ, enc_hidden):
+    def train_step(self, data):
+        inp, targ = data
         loss = 0
-
+        enc_hidden = self.encoder.initialize_hidden_state()
         with tf.GradientTape() as tape:
             enc_output, enc_hidden = self.encoder(inp, enc_hidden)
 
