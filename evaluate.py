@@ -1,14 +1,44 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
+from utils import loss_function
 
-class Evaluator():
+class QuestionGenerator(tf.keras.Model):
     def __init__(self, qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp):
+        super(QuestionGenerator, self).__init__()
         self.qg_dataset = qg_dataset
         self.inp_tokenizer = inp_tokenizer
         self.encoder = encoder
         self.decoder = decoder
         self.targ_tokenizer = targ_tokenizer
         self.max_length_inp = max_length_inp
+
+    ## Training
+    @tf.function
+    def train_step(self, inp, targ, enc_hidden):
+        loss = 0
+
+        with tf.GradientTape() as tape:
+            enc_output, enc_hidden = self.encoder(inp, enc_hidden)
+
+            dec_input = targ[ : , :-1 ] # Ignore <end> token
+            real = targ[ : , 1: ]         # ignore <start> token
+
+            # Set the AttentionMechanism object with encoder_outputs
+            self.decoder.attention_mechanism.setup_memory(enc_output)
+
+            # Create AttentionWrapperState as initial_state for decoder
+            decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
+            pred = self.decoder(dec_input, decoder_initial_state)
+            logits = pred.rnn_output
+            loss = loss_function(real, logits)
+
+        variables = self.encoder.trainable_variables + self.decoder.trainable_variables
+
+        gradients = tape.gradient(loss, variables)
+
+        self.optimizer.apply_gradients(zip(gradients, variables))
+
+        return loss
 
     def evaluate_sentence(self, sentence):
         sentence = self.qg_dataset.preprocess_sentence(sentence)
