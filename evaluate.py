@@ -62,7 +62,7 @@ class QuestionGenerator(tf.keras.Model):
         greedy_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
 
         # Instantiate BasicDecoder object
-        decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=10)
+        decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=20)
         # Setup Memory in decoder stack
         self.decoder.attention_mechanism.setup_memory(enc_out)
 
@@ -78,21 +78,19 @@ class QuestionGenerator(tf.keras.Model):
         print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
 
         outputs, _, _ = decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
-        return outputs.sample_id.numpy()
+        return outputs
 
     def translate(self, sentence):
         result = self.evaluate_sentence(sentence)
         print(result)
-        result = self.targ_tokenizer.sequences_to_texts(result)
+        result = self.targ_tokenizer.sequences_to_texts(result.sample_id.numpy())
         print('Input: %s' % (sentence))
         print('Predicted translation: {}'.format(result))
 
-    def call(self, data):
-        print("CALL - DATA - ", data)
-        print("CALL - DATA len - ", len(data))
-
     def test_step(self, data):
         inp, targ = data
+        print("test_step - inp shape: ", inp.shape)
+        print("test_step - targ shape: ", targ.shape)
         loss = 0
         enc_hidden = self.encoder.initialize_hidden_state()
         
