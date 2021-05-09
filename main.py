@@ -54,6 +54,9 @@ vocab_tar_size = len(targ_tokenizer.word_index)+1
 dataset = tf.data.Dataset.from_tensor_slices((input_tensor_train, target_tensor_train)).shuffle(BUFFER_SIZE)
 dataset = dataset.batch(BATCH_SIZE, drop_remainder=True)
 
+dataset_val = tf.data.Dataset.from_tensor_slices((input_tensor_dev, target_tensor_dev))
+dataset_val = dataset.batch(BATCH_SIZE, drop_remainder=True)
+
 example_input_batch, example_target_batch = next(iter(dataset))
 print("shape input_batch:", example_input_batch.shape)
 print("shape target_batch:", example_target_batch.shape)
@@ -98,7 +101,7 @@ callbacks = [
 EPOCHS = 2
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer)
-qg.fit(dataset, epochs=2, callbacks=callbacks, validation_split=0.2)
+qg.fit(dataset, epochs=2, callbacks=callbacks, validation_data=dataset_val)
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three', 'album', 'deal', 'with', ',', 'which', 'left', '.'])
 qg.translate(["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capital", "of", "the", "German", "state", "of", "Brandenburg", "."])
