@@ -39,7 +39,7 @@ class QuestionGenerator(tf.keras.Model):
 
         self.optimizer.apply_gradients(zip(gradients, variables))
 
-        return loss
+        return {"loss": loss}
 
     def evaluate_sentence(self, sentence):
         sentence = self.qg_dataset.preprocess_sentence(sentence)
