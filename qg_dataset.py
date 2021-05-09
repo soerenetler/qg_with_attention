@@ -1,6 +1,10 @@
 import unicodedata
 import pandas as pd
 
+import ast
+
+import tensorflow as tf
+
 class QGDataset:
   def __init__(self, problem_type='squad', data_folder="/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/"):
     self.problem_type = problem_type
@@ -63,7 +67,7 @@ class QGDataset:
 
     return tensor, lang_tokenizer
 
-  def load_dataset(self):
+  def load_dataset(self, max_length_inp, max_vocab_inp, max_length_targ, max_vocab_targ):
     # creating cleaned input, output pairs
     inp_lang_train, targ_lang_train = self.create_dataset(self.train_path)
     inp_lang_dev, targ_lang_dev = self.create_dataset(self.dev_path)

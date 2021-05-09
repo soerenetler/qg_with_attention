@@ -13,13 +13,13 @@ def generate_embeddings_matrix(path_to_glove_file, tokenizer, embedding_dim = 30
             coefs = np.fromstring(coefs, "f", sep=" ")
             embeddings_index[word] = coefs
 
-    print("Found %s word vectors in {}.".format(len(embeddings_index), path_to_glove_file))
+    print("Found {} word vectors in {}.".format(len(embeddings_index), path_to_glove_file))
 
     hits = 0
     misses = 0
 
     # Prepare embedding matrix
-    num_tokens = len(inp_tokenizer.index_word) + 1
+    num_tokens = len(tokenizer.index_word) + 1
     embedding_matrix = np.zeros((num_tokens, embedding_dim))
     for i, word in tokenizer.index_word.items():
         embedding_vector = embeddings_index.get(word)
