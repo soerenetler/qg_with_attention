@@ -92,8 +92,25 @@ class QuestionGenerator(tf.keras.Model):
         print("CALL - DATA len - ", len(data))
 
     def test_step(self, data):
-        print("TEST_STEP - DATA - ", data)
-        print("TEST_STEP - DATA len - ", len(data))
+        inp, targ = data
+        loss = 0
+        enc_hidden = self.encoder.initialize_hidden_state()
+        
+        enc_output, enc_hidden = self.encoder(inp, enc_hidden)
+
+        dec_input = targ[ : , :-1 ] # Ignore <end> token
+        real = targ[ : , 1: ]         # ignore <start> token
+
+        # Set the AttentionMechanism object with encoder_outputs
+        self.decoder.attention_mechanism.setup_memory(enc_output)
+
+        # Create AttentionWrapperState as initial_state for decoder
+        decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
+        pred = self.decoder(dec_input, decoder_initial_state)
+        logits = pred.rnn_output
+        loss = loss_function(real, logits)
+
+        return {"loss": loss}
 
 
     def beam_evaluate_sentence(self, sentence, beam_width=3):
