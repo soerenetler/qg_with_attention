@@ -1,12 +1,14 @@
-from qg_dataset import QGDataset
-from utils import convert, generate_embeddings_matrix, loss_function
-from encoder import Encoder
-from decoder import Decoder
-from evaluate import QuestionGenerator
 import os
 import time
 
 import tensorflow as tf
+
+from decoder import Decoder
+from encoder import Encoder
+from evaluate import QuestionGenerator
+from qg_dataset import QGDataset
+from utils import convert, generate_embeddings_matrix, loss_function
+from bleu_score import BleuScore
 
 #PARAMS
 path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/"
@@ -104,7 +106,7 @@ callbacks = [
 
 EPOCHS = 2
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer, loss=loss_function)
+qg.compile(optimizer=optimizer, loss=loss_function, metrics=[BleuScore()])
 qg.fit(dataset, epochs=2, callbacks=callbacks, validation_data=dataset_val)
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three', 'album', 'deal', 'with', ',', 'which', 'left', '.'])
