@@ -117,7 +117,7 @@ qg.beam_translate("the largest of these is the eldon square shop-ping centre , o
 qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the', 'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
 
 dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
-chunks = [data[x:x+100] for x in range(0, len(dev_sentences), 100)]
+chunks = [dev_sentences[x:x+100] for x in range(0, len(dev_sentences), 100)]
 for chunk in chunks:
     result, beam_scores = qg.beam_evaluate_sentences(chunk)
     outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
