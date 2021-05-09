@@ -78,15 +78,16 @@ class QGDataset:
     input_tensor, inp_lang_tokenizer = self.tokenize(inp_lang_train, max_length_inp, max_vocab_inp)
     target_tensor, targ_lang_tokenizer = self.tokenize(targ_lang_train, max_length_targ, max_vocab_targ)
 
-    print(inp_lang_dev[0])
-    print(targ_lang_dev[0])
+    print("inp_lang_dev[0]: ", inp_lang_dev[0])
+    print("targ_lang_dev[0] ", targ_lang_dev[0])
     input_tensor_dev = inp_lang_tokenizer.texts_to_sequences(inp_lang_dev)
     target_tensor_dev = targ_lang_tokenizer.texts_to_sequences(targ_lang_dev)
+    print("input_tensor_dev[0]: ", input_tensor_dev[0])
+    print("target_tensor_dev[0] ", target_tensor_dev[0])
 
-    input_tensor_dev = tf.keras.preprocessing.sequence.pad_sequences(input_tensor_dev,maxlen=max_length_inp,padding='post')
-    target_tensor_dev = tf.keras.preprocessing.sequence.pad_sequences(target_tensor_dev,maxlen=max_length_targ,padding='post')
+    input_tensor_pad_dev = tf.keras.preprocessing.sequence.pad_sequences(input_tensor_dev,maxlen=max_length_inp,padding='post')
+    target_tensor_pad_dev = tf.keras.preprocessing.sequence.pad_sequences(target_tensor_dev,maxlen=max_length_targ,padding='post')
+    print("input_tensor_pad_dev[0]: ", input_tensor_pad_dev[0])
+    print("target_tensor_pad_dev[0] ", target_tensor_pad_dev[0])
 
-    print(input_tensor_dev[0])
-    print(target_tensor_dev[0])
-
-    return input_tensor, target_tensor, input_tensor_dev, target_tensor_dev, inp_lang_tokenizer, targ_lang_tokenizer
+    return input_tensor, target_tensor, input_tensor_pad_dev, target_tensor_pad_dev, inp_lang_tokenizer, targ_lang_tokenizer
