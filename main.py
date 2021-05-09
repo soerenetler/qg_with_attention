@@ -104,7 +104,7 @@ callbacks = [
     )
 ]
 
-EPOCHS = 2
+EPOCHS = 1
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 qg.fit(dataset, epochs=2, callbacks=callbacks)
@@ -117,10 +117,12 @@ qg.beam_translate("the largest of these is the eldon square shop-ping centre , o
 qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the', 'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
 
 dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
-result, beam_scores = qg.beam_evaluate_sentences(dev_sentences)
-outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
+chunks = [data[x:x+100] for x in range(0, len(dev_sentences), 100)]
+for chunk in chunks:
+    result, beam_scores = qg.beam_evaluate_sentences(chunk)
+    outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
 
-with open(path_to_model + "demo_val.txt", "a") as f:
-    for output in outputs:
-        f.write(str(output))
-        f.write('\n')
+    with open(path_to_model + "demo_val.txt", "a") as f:
+        for output in outputs:
+            f.write(str(output))
+            f.write('\n')
