@@ -93,22 +93,39 @@ class QuestionGenerator(tf.keras.Model):
 
     def test_step(self, data):
         inp, targ = data
+        real = targ[ : , 1: ]         # ignore <start> token
         print("test_step - inp shape: ", inp.shape)
         print("test_step - targ shape: ", targ.shape)
-        enc_hidden = self.encoder.initialize_hidden_state()
-        
-        enc_output, enc_hidden = self.encoder(inp, enc_hidden)
+        inference_batch_size = inp.shape[0]
 
-        dec_input = targ[ : , :-1 ] # Ignore <end> token
-        real = targ[ : , 1: ]         # ignore <start> token
+        enc_start_state = [tf.zeros((inference_batch_size, self.encoder.enc_units))]
+        enc_out, enc_hidden = self.encoder(inp, enc_start_state, training=False)
 
-        # Set the AttentionMechanism object with encoder_outputs
-        self.decoder.attention_mechanism.setup_memory(enc_output)
+        dec_hidden = enc_hidden
 
-        # Create AttentionWrapperState as initial_state for decoder
-        decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
-        pred = self.decoder(dec_input, decoder_initial_state)
-        logits = pred.rnn_output
+        start_tokens = tf.fill([inference_batch_size], self.targ_tokenizer.word_index['<start>'])
+        end_token = self.targ_tokenizer.word_index['<end>']
+
+        greedy_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
+
+        # Instantiate BasicDecoder object
+        decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=20)
+        # Setup Memory in decoder stack
+        self.decoder.attention_mechanism.setup_memory(enc_out)
+
+        # set decoder_initial_state
+        decoder_initial_state = self.decoder.build_initial_state(inference_batch_size, dec_hidden, tf.float32)
+
+        ### Since the BasicDecoder wraps around Decoder's rnn cell only, you have to ensure that the inputs to BasicDecoder 
+        ### decoding step is output of embedding layer. tfa.seq2seq.GreedyEmbeddingSampler() takes care of this. 
+        ### You only need to get the weights of embedding layer, which can be done by decoder.embedding.variables[0] and pass this callabble to BasicDecoder's call() function
+
+        decoder_embedding_matrix = self.decoder.embedding.variables[0]
+        print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
+
+        outputs, _, _ = decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
+        logits = outputs.rnn_output
+        print("TEST - outputs.rnn_output ", logits.shape)
         # Updates the metrics tracking the loss
         self.compiled_loss(real, logits, regularization_losses=self.losses)
         # Update the metrics.
