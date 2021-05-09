@@ -115,3 +115,4 @@ qg.translate("the largest of these is the eldon square shop-ping centre , one of
 
 qg.beam_translate("the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "))
 qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the', 'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
+qg.evaluate(dataset_val)

@@ -3,7 +3,7 @@ import tensorflow as tf
 
 
 class BleuScore(tf.keras.metrics.Metric):
-    def __init__(self, name="categorical_true_positives", **kwargs):
+    def __init__(self, name="bleu_score", **kwargs):
         super(BleuScore, self).__init__(name=name, **kwargs)
         self.bleu = self.add_weight(name="bleu", initializer="zeros")
 
