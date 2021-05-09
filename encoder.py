@@ -7,7 +7,7 @@ class Encoder(tf.keras.Model):
     self.batch_sz = batch_sz
     self.enc_units = enc_units
 
-    if embedding_matrix != None:
+    if not embedding_matrix == None:
         self.embedding = tf.keras.layers.Embedding(vocab_size,
                                                 embedding_dim,
                                                 embeddings_initializer=tf.keras.initializers.Constant(embedding_matrix),
