@@ -82,6 +82,10 @@ class QGDataset:
     print(targ_lang_dev[0])
     input_tensor_dev = inp_lang_tokenizer.texts_to_sequences(inp_lang_dev)
     target_tensor_dev = targ_lang_tokenizer.texts_to_sequences(targ_lang_dev)
+
+    input_tensor_dev = tf.keras.preprocessing.sequence.pad_sequences(input_tensor_dev,maxlen=max_length_inp,padding='post')
+    target_tensor_dev = tf.keras.preprocessing.sequence.pad_sequences(target_tensor_dev,maxlen=max_length_targ,padding='post')
+
     print(input_tensor_dev[0])
     print(target_tensor_dev[0])
 
