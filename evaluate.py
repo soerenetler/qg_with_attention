@@ -32,7 +32,7 @@ class QuestionGenerator(tf.keras.Model):
             pred = self.decoder(dec_input, decoder_initial_state)
             logits = pred.rnn_output
             # Updates the metrics tracking the loss
-            self.compiled_loss(real, logits, regularization_losses=self.losses)
+            loss=self.compiled_loss(real, logits, regularization_losses=self.losses)
 
         variables = self.encoder.trainable_variables + self.decoder.trainable_variables
 
@@ -92,7 +92,6 @@ class QuestionGenerator(tf.keras.Model):
         inp, targ = data
         print("test_step - inp shape: ", inp.shape)
         print("test_step - targ shape: ", targ.shape)
-        loss = 0
         enc_hidden = self.encoder.initialize_hidden_state()
         
         enc_output, enc_hidden = self.encoder(inp, enc_hidden)
