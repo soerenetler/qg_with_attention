@@ -39,6 +39,7 @@ class QuestionGenerator(tf.keras.Model):
         gradients = tape.gradient(loss, variables)
 
         self.optimizer.apply_gradients(zip(gradients, variables))
+        self.compiled_metrics.update_state(real, logits)
 
         return {m.name: m.result() for m in self.metrics}
 
