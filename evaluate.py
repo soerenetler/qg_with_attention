@@ -81,7 +81,7 @@ class QuestionGenerator(tf.keras.Model):
         decoder_embedding_matrix = self.decoder.embedding.variables[0]
         print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
 
-        outputs, final_state, sequence_lengths, sequence_lengths= decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
+        outputs, final_state, sequence_lengths= decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
         print("final_state, ", final_state)
         print("final_state.alignment_history, ", final_state.alignment_history)
         print("final_state.alignment_history.stack(), ", final_state.alignment_history.stack())
