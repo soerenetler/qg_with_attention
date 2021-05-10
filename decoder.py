@@ -30,7 +30,7 @@ class Decoder(tf.keras.Model):
 
     # Wrap attention mechanism with the fundamental rnn cell of decoder
     self.rnn_cell = tfa.seq2seq.AttentionWrapper(self.gru, 
-                                  self.attention_mechanism, attention_layer_size=self.dec_units)
+                                  self.attention_mechanism, attention_layer_size=self.dec_units, alignment_history=True)
     
     # Define the decoder with respect to fundamental rnn cell
     self.decoder = tfa.seq2seq.BasicDecoder(self.rnn_cell, sampler=self.sampler, output_layer=self.fc)
