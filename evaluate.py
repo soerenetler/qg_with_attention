@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
-from utils import loss_function
+from utils import plot_attention
 
 class QuestionGenerator(tf.keras.Model):
     def __init__(self, qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp):
@@ -86,12 +86,15 @@ class QuestionGenerator(tf.keras.Model):
         print("final_state.alignment_history, ", final_state.alignment_history)
         print("final_state.alignment_history.stack(), ", final_state.alignment_history.stack())
         
-        return outputs
+        return outputs, final_state
 
     def translate(self, sentence):
-        result = self.evaluate_sentence(sentence)
+        result, final_state = self.evaluate_sentence(sentence)
         print(result)
         result = self.targ_tokenizer.sequences_to_texts(result.sample_id.numpy())
+        attention_matrix = final_state.alignment_history.stack()
+        
+        plot_attention(attention_matrix[:,0,:], sentence, result)
         print('Input: %s' % (sentence))
         print('Predicted translation: {}'.format(result))
 
