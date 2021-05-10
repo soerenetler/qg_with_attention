@@ -104,7 +104,7 @@ callbacks = [
     )
 ]
 
-EPOCHS = 1
+EPOCHS = 15
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks)
