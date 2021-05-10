@@ -91,12 +91,12 @@ class QuestionGenerator(tf.keras.Model):
     def translate(self, sentence):
         result, final_state = self.evaluate_sentence(sentence)
         print(result)
-        result = self.targ_tokenizer.sequences_to_texts(result.sample_id.numpy())
+        result_str = self.targ_tokenizer.sequences_to_texts(result.sample_id.numpy())
         attention_matrix = final_state.alignment_history.stack()
         
-        plot_attention(attention_matrix[:,0,:], sentence, result)
+        plot_attention(attention_matrix[:len(result_str.split(" ")),0,:len(sentence)], sentence, result_str.split(" "))
         print('Input: %s' % (sentence))
-        print('Predicted translation: {}'.format(result))
+        print('Predicted translation: {}'.format(result_str))
 
     def beam_evaluate_sentences(self, sentences, beam_width=3):
         sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
