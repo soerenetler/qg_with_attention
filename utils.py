@@ -59,6 +59,9 @@ def loss_function(real, pred):
 def plot_attention(attention, sentence, predicted_sentence):
     import matplotlib.pyplot as plt
     import matplotlib.ticker as ticker
+    print("attention", attention.shape)
+    print("sentence", sentence)
+    print("predicted_sentence", predicted_sentence)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(1, 1, 1)
     ax.matshow(attention, cmap='viridis')
@@ -71,4 +74,4 @@ def plot_attention(attention, sentence, predicted_sentence):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
-    plt.show()
+    plt.savefig('books_read.png')
