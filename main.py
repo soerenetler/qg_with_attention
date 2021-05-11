@@ -13,7 +13,7 @@ from bleu_score import BleuScore
 #PARAMS
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--dataset", type=str, default="/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/",
+parser.add_argument("-d", "--dataset", type=str, default="squad",
                     help="display a square of a given number")
 parser.add_argument("-t", "--target_length", type=int, default=20,
                     help="max_length_targ")
