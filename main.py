@@ -15,8 +15,6 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--dataset", type=str, default="/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/",
                     help="display a square of a given number")
-parser.add_argument("-g", "--glove", type=str, default="/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt",
-                    help="display a square of a given number")
 parser.add_argument("-t", "--target_length", type=int, default=20,
                     help="max_length_targ")
 parser.add_argument("-i", "--input_length", type=int, default=80,
@@ -37,7 +35,7 @@ args = parser.parse_args()
 
 path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" + args.dataset + "/question_answer/"
 path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + args.dataset + "/"
-path_to_glove_file = args.glove
+path_to_glove_file = "/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt"
 max_length_targ = args.target_length
 max_length_inp = args.input_length
 max_vocab_inp = args.vocab_input
@@ -94,7 +92,7 @@ print("shape target_batch_val:", example_target_batch_val.shape)
 
 encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE, bidirectional=False, embedding_matrix=embedding_matrix)
 # sample input
-sample_hidden = encoder.initialize_hidden_state()
+sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 sample_output, sample_hidden = encoder(example_input_batch, sample_hidden)
 print ('Encoder output shape: (batch size, sequence length, units) {}'.format(sample_output.shape))
 print ('Encoder Hidden state shape: (batch size, units) {}'.format(sample_hidden.shape))
