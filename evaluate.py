@@ -49,9 +49,9 @@ class QuestionGenerator(tf.keras.Model):
         proc_sentence = self.qg_dataset.preprocess_sentence(sentence)
 
         inputs = self.inp_tokenizer.texts_to_sequences([proc_sentence])
-        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
-                                                                maxlen=self.max_length_inp,
-                                                                padding='post')
+        #inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
+        #                                                        maxlen=self.max_length_inp,
+        #                                                        padding='post')
         inputs = tf.convert_to_tensor(inputs)
         inference_batch_size = inputs.shape[0]
 
