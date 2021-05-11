@@ -11,14 +11,36 @@ from utils import convert, generate_embeddings_matrix, loss_function
 from bleu_score import BleuScore
 
 #PARAMS
-path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/"
-path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/squad/"
-path_to_glove_file = "/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt"
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("-d", "--data", type=str, default="/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/",
+                    help="display a square of a given number")
+parser.add_argument("-m", "--model", type=str, default="/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/squad/",
+                    help="display a square of a given number")
+parser.add_argument("-g", "--glove", type=str, default="/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt",
+                    help="display a square of a given number")
+parser.add_argument("-t", "--target_length", type=int, default=20,
+                    help="max_length_targ")
+parser.add_argument("-i", "--input_length", type=str, default=80,
+                    help="display a square of a given number")
+parser.add_argument("-x", "--vocab_input", type=str, default=45000,
+                    help="display a square of a given number")
+parser.add_argument("-y", "--max_vocab_targ", type=str, default=28000,
+                    help="display a square of a given number")
+parser.add_argument("-e", "--epochs", type=str, default=1,
+                    help="display a square of a given number")
+args = parser.parse_args()
 
-max_length_targ = 20
-max_length_inp = 80
-max_vocab_inp = 45000
-max_vocab_targ = 28000
+
+
+path_to_folder = args.data
+path_to_model = args.model
+path_to_glove_file = args.glove
+max_length_targ = args.target_length
+max_length_inp = args.input_length
+max_vocab_inp = args.vocab_input
+max_vocab_targ = args.max_vocab_targ
+EPOCHS = args.epochs
 
 
 #SAMPLES
@@ -104,7 +126,6 @@ callbacks = [
     )
 ]
 
-EPOCHS = 15
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks)
