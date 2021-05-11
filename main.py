@@ -21,13 +21,13 @@ parser.add_argument("-g", "--glove", type=str, default="/content/gdrive/MyDrive/
                     help="display a square of a given number")
 parser.add_argument("-t", "--target_length", type=int, default=20,
                     help="max_length_targ")
-parser.add_argument("-i", "--input_length", type=str, default=80,
+parser.add_argument("-i", "--input_length", type=int, default=80,
                     help="display a square of a given number")
-parser.add_argument("-x", "--vocab_input", type=str, default=45000,
+parser.add_argument("-x", "--vocab_input", type=int, default=45000,
                     help="display a square of a given number")
-parser.add_argument("-y", "--max_vocab_targ", type=str, default=28000,
+parser.add_argument("-y", "--max_vocab_targ", type=int, default=28000,
                     help="display a square of a given number")
-parser.add_argument("-e", "--epochs", type=str, default=1,
+parser.add_argument("-e", "--epochs", type=int, default=1,
                     help="display a square of a given number")
 args = parser.parse_args()
 
