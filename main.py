@@ -31,7 +31,8 @@ parser.add_argument("-b", "--batch", type=int, default=64,
                     help="display a square of a given number")
 args = parser.parse_args()
 
-
+print(args)
+print(type(args))
 
 path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" + args.dataset + "/question_answer/"
 path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + args.dataset + "/"
