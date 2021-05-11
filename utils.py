@@ -56,7 +56,7 @@ def loss_function(real, pred):
 # function for plotting the attention weights
 
 
-def plot_attention(attention, sentence, predicted_sentence):
+def plot_attention(attention, sentence, predicted_sentence, folder=""):
     import matplotlib.pyplot as plt
     import matplotlib.ticker as ticker
     print("attention", attention.shape)
@@ -74,4 +74,4 @@ def plot_attention(attention, sentence, predicted_sentence):
     ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
-    plt.savefig('books_read.png')
+    plt.savefig(folder+"_".join(sentence[:5])+'-'+"_".join(predicted_sentence[:5])+'.png')

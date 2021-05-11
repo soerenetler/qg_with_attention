@@ -46,9 +46,9 @@ class QuestionGenerator(tf.keras.Model):
         return {m.name: m.result() for m in self.metrics}
 
     def evaluate_sentence(self, sentence):
-        sentence = self.qg_dataset.preprocess_sentence(sentence)
+        proc_sentence = self.qg_dataset.preprocess_sentence(sentence)
 
-        inputs = self.inp_tokenizer.texts_to_sequences([sentence])
+        inputs = self.inp_tokenizer.texts_to_sequences([proc_sentence])
         inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
                                                                 maxlen=self.max_length_inp,
                                                                 padding='post')
@@ -86,15 +86,15 @@ class QuestionGenerator(tf.keras.Model):
         print("final_state.alignment_history, ", final_state.alignment_history)
         print("final_state.alignment_history.stack(), ", final_state.alignment_history.stack())
         
-        return outputs, final_state
+        return outputs, final_state, proc_sentence
 
-    def translate(self, sentence):
-        result, final_state = self.evaluate_sentence(sentence)
+    def translate(self, sentence, attention_plot_folder=""):
+        result, final_state, proc_sentence = self.evaluate_sentence(sentence)
         print(result)
         result_str = self.targ_tokenizer.sequences_to_texts(result.sample_id.numpy())
         attention_matrix = final_state.alignment_history.stack()
         
-        plot_attention(attention_matrix[:len(result_str[0].split(" ")),0,:len(sentence)], sentence, result_str[0].split(" "))
+        plot_attention(attention_matrix[:,0,:], sentence, result_str[0].split(" "), folder=attention_plot_folder)
         print('Input: %s' % (sentence))
         print('Predicted translation: {}'.format(result_str))
 
