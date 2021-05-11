@@ -94,7 +94,7 @@ class QuestionGenerator(tf.keras.Model):
         result_str = self.targ_tokenizer.sequences_to_texts(result.sample_id.numpy())
         attention_matrix = final_state.alignment_history.stack()
         
-        plot_attention(attention_matrix[:,0,:], sentence, result_str[0].split(" "), folder=attention_plot_folder)
+        plot_attention(attention_matrix[:,0,:], proc_sentence, result_str[0].split(" "), folder=attention_plot_folder)
         print('Input: %s' % (sentence))
         print('Predicted translation: {}'.format(result_str))
 
