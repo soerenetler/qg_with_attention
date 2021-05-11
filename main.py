@@ -13,9 +13,7 @@ from bleu_score import BleuScore
 #PARAMS
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-d", "--data", type=str, default="/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/",
-                    help="display a square of a given number")
-parser.add_argument("-m", "--model", type=str, default="/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/squad/",
+parser.add_argument("-d", "--dataset", type=str, default="/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/squad/question_answer/",
                     help="display a square of a given number")
 parser.add_argument("-g", "--glove", type=str, default="/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt",
                     help="display a square of a given number")
@@ -37,8 +35,8 @@ args = parser.parse_args()
 
 
 
-path_to_folder = args.data
-path_to_model = args.model
+path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" + args.dataset + "/question_answer/"
+path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + args.dataset + "/"
 path_to_glove_file = args.glove
 max_length_targ = args.target_length
 max_length_inp = args.input_length
@@ -142,13 +140,13 @@ qg.translate("the largest of these is the eldon square shop-ping centre , one of
 qg.beam_translate("the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "))
 qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the', 'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
 
-# dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
-# chunks = [dev_sentences[x:x+100] for x in range(0, len(dev_sentences), 100)]
-# for chunk in chunks:
-#     result, beam_scores = qg.beam_evaluate_sentences(chunk)
-#     outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
+dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
+chunks = [dev_sentences[x:x+100] for x in range(0, len(dev_sentences), 100)]
+for chunk in chunks:
+    result, beam_scores = qg.beam_evaluate_sentences(chunk)
+    outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
 
-#     with open(path_to_model + "demo_val.txt", "a") as f:
-#         for output in outputs:
-#             f.write(str(output))
-#             f.write('\n')
+    with open(path_to_model + "demo_val.txt", "a") as f:
+        for output in outputs:
+            f.write(str(output))
+            f.write('\n')
