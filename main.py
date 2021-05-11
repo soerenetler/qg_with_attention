@@ -147,7 +147,7 @@ for chunk in chunks:
 
     filename= ""
     for key, value in vars(args).items():
-        filename += key +"_"+ value+ "-"
+        filename += key +"_"+ str(value)+ "-"
     filename+=".txt"
 
     with open(path_to_model + filename, "a") as f:
