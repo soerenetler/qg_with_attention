@@ -145,7 +145,12 @@ for chunk in chunks:
     result, beam_scores = qg.beam_evaluate_sentences(chunk)
     outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
 
-    with open(path_to_model + "demo_val.txt", "a") as f:
+    filename= ""
+    for key, value in vars(args).items():
+        filename += key +"_"+ value+ "-"
+    filename+=".txt"
+
+    with open(path_to_model + filename, "a") as f:
         for output in outputs:
             f.write(str(output))
             f.write('\n')
