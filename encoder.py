@@ -32,8 +32,8 @@ class Encoder(tf.keras.Model):
             output, state = self.gru(x, initial_state=hidden)
         return output, state
 
-    def initialize_hidden_state(self):
+    def initialize_hidden_state(self, batch_sz):
         if self.bidirectional:
-            return [tf.zeros((self.batch_sz, self.enc_units)) for i in range(2)]
+            return [tf.zeros((batch_sz, self.enc_units)) for i in range(2)]
         else:
-            return tf.zeros((self.batch_sz, self.enc_units))
+            return tf.zeros((batch_sz, self.enc_units))

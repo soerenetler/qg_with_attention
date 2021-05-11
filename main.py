@@ -29,6 +29,10 @@ parser.add_argument("-y", "--max_vocab_targ", type=int, default=28000,
                     help="display a square of a given number")
 parser.add_argument("-e", "--epochs", type=int, default=1,
                     help="display a square of a given number")
+parser.add_argument("-u", "--units", type=int, default=600,
+                    help="display a square of a given number")
+parser.add_argument("-b", "--batch", type=int, default=64,
+                    help="display a square of a given number")
 args = parser.parse_args()
 
 
@@ -41,6 +45,8 @@ max_length_inp = args.input_length
 max_vocab_inp = args.vocab_input
 max_vocab_targ = args.max_vocab_targ
 EPOCHS = args.epochs
+BATCH_SIZE = args.batch
+units = args.units
 
 
 #SAMPLES
@@ -69,9 +75,8 @@ embedding_matrix = generate_embeddings_matrix(path_to_glove_file, inp_tokenizer,
 
 # Create a tf.data dataset
 BUFFER_SIZE = len(input_tensor_train)
-BATCH_SIZE = 64
+
 steps_per_epoch = len(input_tensor_train)//BATCH_SIZE
-units = 600
 vocab_inp_size = len(inp_tokenizer.word_index)+1 # PADDING
 vocab_tar_size = len(targ_tokenizer.word_index)+1
 
