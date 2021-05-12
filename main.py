@@ -34,8 +34,12 @@ args = parser.parse_args()
 print(args)
 print(type(args))
 
+modelname= ""
+for key, value in vars(args).items():
+    modelname += key +"_"+ str(value)+ "-"
+
 path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" + args.dataset + "/question_answer/"
-path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + args.dataset + "/"
+path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + args.dataset + "/" + modelname + "/" 
 path_to_glove_file = "/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt"
 max_length_targ = args.target_length
 max_length_inp = args.input_length
@@ -121,9 +125,9 @@ callbacks = [
         # the current checkpoint if and only if
         # the `val_loss` score has improved.
         # The saved model name will include the current epoch.
-        filepath=checkpoint_dir + "/mymodel_{epoch}",
-        save_best_only=True,  # Only save a model if `val_loss` has improved.
-        monitor="val_loss",
+        filepath=checkpoint_dir + "/model_{epoch}",
+        #save_best_only=True,  # Only save a model if `val_loss` has improved.
+        #monitor="val_loss",
         verbose=1,
     )
 ]
@@ -145,10 +149,7 @@ for chunk in chunks:
     result, beam_scores = qg.beam_evaluate_sentences(chunk)
     outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
 
-    filename= ""
-    for key, value in vars(args).items():
-        filename += key +"_"+ str(value)+ "-"
-    filename+=".txt"
+    filename = modelname + ".txt"
 
     with open(path_to_model + filename, "a") as f:
         for output in outputs:
