@@ -87,7 +87,7 @@ class QuestionGenerator(tf.keras.Model):
             print("final_state, ", final_state)
             print("final_state.alignment_history, ", final_state.alignment_history)
             print("final_state.alignment_history.stack(), ", final_state.alignment_history.stack())
-            
+            print("EVALUATION - Outputs", outputs.sample_id.shape)
             return outputs
         
         else:
