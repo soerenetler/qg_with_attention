@@ -19,7 +19,7 @@ class QuestionGenerator(tf.keras.Model):
         loss = 0
         
         with tf.GradientTape() as tape:
-            pred = self((inp, targ))
+            pred = self((inp, targ), training=True)
             real = targ[ : , 1: ]         # ignore <start> token
 
             print("TRAIN - pred.rnn_output ", pred.rnn_output.shape)
