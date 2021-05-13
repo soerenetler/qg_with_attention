@@ -106,7 +106,7 @@ decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE, targ_tokeniz
 sample_x = tf.random.uniform((BATCH_SIZE, max_length_targ), dtype=tf.dtypes.float32)
 decoder.attention_mechanism.setup_memory(sample_output)
 initial_state = decoder.build_initial_state(BATCH_SIZE, sample_hidden, tf.float32)
-sample_decoder_outputs = decoder(sample_x, initial_state)
+sample_decoder_outputs = decoder(sample_x, initial_state, training=True)
 print("Decoder Outputs Shape: ", sample_decoder_outputs.rnn_output.shape)
 
 ## Define the optimizer and the loss function
