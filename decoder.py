@@ -2,9 +2,8 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 class Decoder(tf.keras.Model):
-  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=20, max_length_targ=80):
+  def __init__(self, vocab_size, embedding_dim, dec_units, attention_type='luong', max_length_inp=20, max_length_targ=80):
     super(Decoder, self).__init__()
-    self.batch_sz = batch_sz
     self.dec_units = dec_units
     self.attention_type = attention_type
     self.max_length_inp=max_length_inp
@@ -23,6 +22,10 @@ class Decoder(tf.keras.Model):
 
     # Sampler
     self.sampler = tfa.seq2seq.sampler.TrainingSampler()
+
+  def build(self, input_shape):
+    self.batch_sz = input_shape[0]
+    print("DECODER - self.batch_sz", self.batch_sz)
 
     # Create attention mechanism with memory = None
     self.attention_mechanism = self.build_attention_mechanism(self.dec_units, 
@@ -55,7 +58,6 @@ class Decoder(tf.keras.Model):
   def call(self, x, hidden):
     print("initial_state: ", hidden)
     print("dec_input: ", x)
-    batch_sz = x.shape[0]
     x = self.embedding(x)    
-    outputs, _, _ = self.decoder(x, initial_state=hidden, sequence_length=batch_sz*[self.max_length_targ-1])
+    outputs, _, _ = self.decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
     return outputs
