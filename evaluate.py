@@ -52,6 +52,11 @@ class QuestionGenerator(tf.keras.Model):
         # Note that it will include the loss (tracked in self.metrics).
         return {m.name: m.result() for m in self.metrics}
 
+    def build(self, input_shape):
+        # AFAIK: The most convenient method to print model.summary() 
+        # similar to the sequential or functional API like.
+        x = tf.keras.Input(shape=input_shape)
+        return tf.keras.Model(inputs=[x], outputs=self.call(x, training=False))
 
     def call(self, qg_inputs, training=None):
         if training == True:
