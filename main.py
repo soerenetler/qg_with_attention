@@ -102,7 +102,7 @@ sample_output, sample_hidden = encoder(example_input_batch, sample_hidden)
 print ('Encoder output shape: (batch size, sequence length, units) {}'.format(sample_output.shape))
 print ('Encoder Hidden state shape: (batch size, units) {}'.format(sample_hidden.shape))
 
-decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE, 'luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ)
+decoder = Decoder(vocab_tar_size, embedding_dim, units, 'luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ)
 sample_x = tf.random.uniform((BATCH_SIZE, max_length_targ), dtype=tf.dtypes.float32)
 decoder.attention_mechanism.setup_memory(sample_output)
 initial_state = decoder.build_initial_state(BATCH_SIZE, sample_hidden, tf.float32)
