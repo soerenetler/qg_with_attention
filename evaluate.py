@@ -14,7 +14,7 @@ class QuestionGenerator(tf.keras.Model):
         self.max_length_inp = max_length_inp
 
     # Training
-    @tf.function
+    #@tf.function
     def train_step(self, data):
         inp, targ = data
 
@@ -73,6 +73,7 @@ class QuestionGenerator(tf.keras.Model):
             pred = self.decoder(dec_input, decoder_initial_state, training=True)
 
             return pred
+
         elif training == False:
             print("qg_inputs:", qg_inputs)
             if type(qg_inputs) == tf.Tensor:
