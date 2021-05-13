@@ -38,7 +38,7 @@ class QuestionGenerator(tf.keras.Model):
         return {m.name: m.result() for m in self.metrics}
 
     def call(self, qg_inputs, training=None):
-        if training:
+        if training == True:
             inp, targ = qg_inputs
             batch_sz = inp.shape[0]
 
@@ -54,6 +54,41 @@ class QuestionGenerator(tf.keras.Model):
             pred = self.decoder(dec_input, decoder_initial_state)
 
             return pred
+        elif training == False:
+            inp = qg_inputs
+            
+            inference_batch_size = inp.shape[0]
+
+            enc_start_state = self.encoder.initialize_hidden_state(inference_batch_size)
+            enc_out, enc_hidden = self.encoder(inp, enc_start_state, training=False)
+
+            start_tokens = tf.fill([inference_batch_size], self.targ_tokenizer.word_index['<start>'])
+            end_token = self.targ_tokenizer.word_index['<end>']
+
+            greedy_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
+
+            # Instantiate BasicDecoder object
+            decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=20)
+            # Setup Memory in decoder stack
+            self.decoder.attention_mechanism.setup_memory(enc_out)
+
+            # set decoder_initial_state
+            decoder_initial_state = self.decoder.build_initial_state(inference_batch_size, enc_hidden, tf.float32)
+
+            ### Since the BasicDecoder wraps around Decoder's rnn cell only, you have to ensure that the inputs to BasicDecoder 
+            ### decoding step is output of embedding layer. tfa.seq2seq.GreedyEmbeddingSampler() takes care of this. 
+            ### You only need to get the weights of embedding layer, which can be done by decoder.embedding.variables[0] and pass this callabble to BasicDecoder's call() function
+
+            decoder_embedding_matrix = self.decoder.embedding.variables[0]
+            print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
+
+            outputs, final_state, sequence_lengths= decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
+            print("final_state, ", final_state)
+            print("final_state.alignment_history, ", final_state.alignment_history)
+            print("final_state.alignment_history.stack(), ", final_state.alignment_history.stack())
+            
+            return outputs
+        
         else:
             raise NotImplementedError("Call is currently not implemented with training set to {}".format(training))
 
