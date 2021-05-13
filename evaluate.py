@@ -16,7 +16,6 @@ class QuestionGenerator(tf.keras.Model):
     @tf.function
     def train_step(self, data):
         inp, targ = data
-        loss = 0
         
         with tf.GradientTape() as tape:
             pred = self((inp, targ), training=True)
@@ -36,6 +35,23 @@ class QuestionGenerator(tf.keras.Model):
         self.compiled_metrics.update_state(real, pred_token)
 
         return {m.name: m.result() for m in self.metrics}
+
+    def test_step(self, data):
+        # Unpack the data
+        inp, targ = data
+        # Compute predictions
+        pred = self((inp, None), training=False)
+        real = targ[ : , 1: ] 
+        logits = pred.rnn_output
+        pred_token = pred.sample_id
+        # Updates the metrics tracking the loss
+        self.compiled_loss(real, logits, regularization_losses=self.losses)
+        # Update the metrics.
+        self.compiled_metrics.update_state(real, pred_token)
+        # Return a dict mapping metric names to current value.
+        # Note that it will include the loss (tracked in self.metrics).
+        return {m.name: m.result() for m in self.metrics}
+
 
     def call(self, qg_inputs, training=None):
         if training == True:
@@ -75,7 +91,7 @@ class QuestionGenerator(tf.keras.Model):
             greedy_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
 
             # Instantiate BasicDecoder object
-            decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=19)
+            decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=20)
             # Setup Memory in decoder stack
             self.decoder.attention_mechanism.setup_memory(enc_out)
 
