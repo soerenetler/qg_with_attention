@@ -6,6 +6,7 @@ class Encoder(tf.keras.layers.Layer):
         super(Encoder, self).__init__()
         self.bidirectional = bidirectional
         self.enc_units = enc_units
+        self.batch_sz = batch_sz
 
         self.embedding = tf.keras.layers.Embedding(vocab_size,
                                                    embedding_dim,
