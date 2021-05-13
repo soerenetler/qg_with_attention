@@ -95,7 +95,8 @@ class QuestionGenerator(tf.keras.Model):
             # set decoder_initial_state
 
 
-            self.decoder(None, enc_hidden, training=False)
+            pred = self.decoder(None, enc_hidden, training=False)
+            return pred
 
         else:
             raise NotImplementedError(
