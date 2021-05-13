@@ -1,9 +1,10 @@
 import tensorflow as tf
 import tensorflow_addons as tfa
 
-class Decoder(tf.keras.Model):
-  def __init__(self, vocab_size, embedding_dim, dec_units, attention_type='luong', max_length_inp=20, max_length_targ=80):
+class Decoder(tf.keras.layers.Layer):
+  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=20, max_length_targ=80):
     super(Decoder, self).__init__()
+    self.batch_sz = batch_sz
     self.dec_units = dec_units
     self.attention_type = attention_type
     self.max_length_inp=max_length_inp
@@ -22,10 +23,6 @@ class Decoder(tf.keras.Model):
 
     # Sampler
     self.sampler = tfa.seq2seq.sampler.TrainingSampler()
-
-  def build(self, input_shape):
-    self.batch_sz = input_shape[0]
-    print("DECODER - self.batch_sz", self.batch_sz)
 
     # Create attention mechanism with memory = None
     self.attention_mechanism = self.build_attention_mechanism(self.dec_units, 

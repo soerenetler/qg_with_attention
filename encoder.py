@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-class Encoder(tf.keras.Model):
+class Encoder(tf.keras.layers.Layer):
     def __init__(self, vocab_size, embedding_dim, enc_units, batch_sz, embedding_matrix, bidirectional=False):
         super(Encoder, self).__init__()
         self.bidirectional = bidirectional
