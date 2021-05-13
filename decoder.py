@@ -59,5 +59,5 @@ class Decoder(tf.keras.layers.Layer):
     print("initial_state: ", hidden)
     print("dec_input: ", x)
     x = self.embedding(x)    
-    outputs, _, _ = self.train_decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-2])
+    outputs, _, _ = self.train_decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
     return outputs
