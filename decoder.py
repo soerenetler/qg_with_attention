@@ -66,13 +66,15 @@ class Decoder(tf.keras.layers.Layer):
       return outputs
     elif training == False:
       inference_batch_size = hidden.shape[0]
+      decoder_initial_state = self.decoder.build_initial_state(
+                inference_batch_size, hidden, tf.float32)
       start_tokens = tf.fill(
                 [inference_batch_size], self.start_token)
       decoder_embedding_matrix = self.embedding.variables[0]
       print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
 
       outputs, final_state, sequence_lengths = self.inference_decoder(
-          decoder_embedding_matrix, start_tokens=start_tokens, end_token=self.end_token, initial_state=hidden)
+          decoder_embedding_matrix, start_tokens=start_tokens, end_token=self.end_token, initial_state=decoder_initial_state)
       print("sequence_lengths", sequence_lengths)
       print("final_state, ", final_state)
       print("final_state.alignment_history, ",

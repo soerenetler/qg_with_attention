@@ -93,10 +93,9 @@ class QuestionGenerator(tf.keras.Model):
             # Setup Memory in decoder stack
             self.decoder.attention_mechanism.setup_memory(enc_out)
             # set decoder_initial_state
-            decoder_initial_state = self.decoder.build_initial_state(
-                inference_batch_size, enc_hidden, tf.float32)
 
-            self.decoder(None, decoder_initial_state, training=False)
+
+            self.decoder(None, enc_hidden, training=False)
 
         else:
             raise NotImplementedError(
