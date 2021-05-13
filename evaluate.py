@@ -55,8 +55,14 @@ class QuestionGenerator(tf.keras.Model):
 
             return pred
         elif training == False:
-            print(qg_inputs)
-            inp, targ = qg_inputs
+            print("qg_inputs:", qg_inputs)
+            print("len(qg_inputs):", len(qg_inputs))
+            if len(qg_inputs)==1:
+                inp = qg_inputs
+            elif len(qg_inputs)==2:
+                inp, _ = qg_inputs
+            else:
+                raise NotImplementedError("Input has a length of {}.".format(len(qg_inputs)))
             
             inference_batch_size = inp.shape[0]
 
