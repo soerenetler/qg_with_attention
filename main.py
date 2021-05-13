@@ -98,7 +98,7 @@ print("shape target_batch_val:", example_target_batch_val.shape)
 encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE, bidirectional=False, embedding_matrix=embedding_matrix)
 # sample input
 sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
-sample_output, sample_hidden = encoder(example_input_batch, sample_hidden)
+sample_output, sample_hidden = encoder(example_input_batch, sample_hidden, training=True)
 print ('Encoder output shape: (batch size, sequence length, units) {}'.format(sample_output.shape))
 print ('Encoder Hidden state shape: (batch size, units) {}'.format(sample_hidden.shape))
 
