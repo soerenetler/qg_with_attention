@@ -55,7 +55,8 @@ class QuestionGenerator(tf.keras.Model):
 
             return pred
         elif training == False:
-            inp = qg_inputs
+            print(qg_inputs)
+            inp, targ = qg_inputs
             
             inference_batch_size = inp.shape[0]
 
