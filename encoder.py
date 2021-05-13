@@ -22,7 +22,7 @@ class Encoder(tf.keras.layers.Layer):
         if self.bidirectional:
             self.gru = tf.keras.layers.Bidirectional(self.gru)
 
-    def call(self, x, hidden, training=None):
+    def call(self, x, hidden, training=False):
         x = self.embedding(x)
         if self.bidirectional:
             output, forward_state, backward_state = self.gru(

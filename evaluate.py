@@ -54,7 +54,7 @@ class QuestionGenerator(tf.keras.Model):
         # Note that it will include the loss (tracked in self.metrics).
         return {m.name: m.result() for m in self.metrics}
 
-    def call(self, qg_inputs, training=None):
+    def call(self, qg_inputs, training=False):
         if training == True:
             inp, targ = qg_inputs
             batch_sz = inp.shape[0]

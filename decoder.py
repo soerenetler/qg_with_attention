@@ -57,7 +57,7 @@ class Decoder(tf.keras.layers.Layer):
     decoder_initial_state = decoder_initial_state.clone(cell_state=encoder_state)
     return decoder_initial_state
 
-  def call(self, x, hidden, training=None):
+  def call(self, x, hidden, training=False):
     if training == True:
       print("initial_state: ", hidden)
       print("dec_input: ", x)
