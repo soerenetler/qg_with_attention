@@ -14,7 +14,7 @@ class QuestionGenerator(tf.keras.Model):
         self.max_length_inp = max_length_inp
 
     # Training
-    #@tf.function
+    @tf.function
     def train_step(self, data):
         inp, targ = data
 
@@ -38,6 +38,7 @@ class QuestionGenerator(tf.keras.Model):
 
         return {m.name: m.result() for m in self.metrics}
 
+    @tf.function
     def test_step(self, data):
         # Unpack the data
         inp, targ = data
