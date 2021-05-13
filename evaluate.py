@@ -75,7 +75,7 @@ class QuestionGenerator(tf.keras.Model):
             greedy_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
 
             # Instantiate BasicDecoder object
-            decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=20)
+            decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=19)
             # Setup Memory in decoder stack
             self.decoder.attention_mechanism.setup_memory(enc_out)
 
