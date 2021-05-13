@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 class Decoder(tf.keras.layers.Layer):
-  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=20, max_length_targ=80, **kwargs):
+  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=80, max_length_targ=20, **kwargs):
     super(Decoder, self).__init__(**kwargs)
     self.batch_sz = batch_sz
     self.dec_units = dec_units
@@ -22,7 +22,8 @@ class Decoder(tf.keras.layers.Layer):
     self.fc = tf.keras.layers.Dense(vocab_size)
 
     # Sampler
-    self.sampler = tfa.seq2seq.sampler.TrainingSampler()
+    self.train_sampler = tfa.seq2seq.sampler.TrainingSampler()
+    self.inference_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
 
     # Create attention mechanism with memory = None
     self.attention_mechanism = self.build_attention_mechanism(self.dec_units, 
@@ -33,7 +34,9 @@ class Decoder(tf.keras.layers.Layer):
                                   self.attention_mechanism, attention_layer_size=self.dec_units, alignment_history=True)
     
     # Define the decoder with respect to fundamental rnn cell
-    self.decoder = tfa.seq2seq.BasicDecoder(self.rnn_cell, sampler=self.sampler, output_layer=self.fc)
+    self.train_decoder = tfa.seq2seq.BasicDecoder(self.rnn_cell, sampler=self.train_sampler, output_layer=self.fc)
+    # Instantiate BasicDecoder object
+    self.inference_decoder = tfa.seq2seq.BasicDecoder(cell=self.rnn_cell, sampler=self.inference_sampler, output_layer=self.fc, maximum_iterations=19)
 
   def build_attention_mechanism(self, dec_units, memory, memory_sequence_length, attention_type='luong'):
     # ------------- #
@@ -52,12 +55,9 @@ class Decoder(tf.keras.layers.Layer):
     decoder_initial_state = decoder_initial_state.clone(cell_state=encoder_state)
     return decoder_initial_state
 
-  def build(self, input_shape):
-    self.decoder.build(input_shape)
-
   def call(self, x, hidden):
     print("initial_state: ", hidden)
     print("dec_input: ", x)
     x = self.embedding(x)    
-    outputs, _, _ = self.decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
+    outputs, _, _ = self.train_decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
     return outputs
