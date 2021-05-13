@@ -2,13 +2,15 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 class Decoder(tf.keras.layers.Layer):
-  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=80, max_length_targ=20, **kwargs):
+  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, attention_type='luong', max_length_inp=80, max_length_targ=20, **kwargs):
     super(Decoder, self).__init__(**kwargs)
     self.batch_sz = batch_sz
     self.dec_units = dec_units
     self.attention_type = attention_type
     self.max_length_inp=max_length_inp
     self.max_length_targ=max_length_targ
+    self.start_token = start_token
+    self.end_token = end_token
 
     # Embedding Layer
     self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
@@ -55,9 +57,30 @@ class Decoder(tf.keras.layers.Layer):
     decoder_initial_state = decoder_initial_state.clone(cell_state=encoder_state)
     return decoder_initial_state
 
-  def call(self, x, hidden):
-    print("initial_state: ", hidden)
-    print("dec_input: ", x)
-    x = self.embedding(x)    
-    outputs, _, _ = self.train_decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
-    return outputs
+  def call(self, x, hidden, training=None):
+    if training == True:
+      print("initial_state: ", hidden)
+      print("dec_input: ", x)
+      x = self.embedding(x)    
+      outputs, _, _ = self.train_decoder(x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
+      return outputs
+    elif training == False:
+      inference_batch_size = hidden.shape[0]
+      start_tokens = tf.fill(
+                [inference_batch_size], self.start_token)
+      decoder_embedding_matrix = self.embedding.variables[0]
+      print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
+
+      outputs, final_state, sequence_lengths = self.inference_decoder(
+          decoder_embedding_matrix, start_tokens=start_tokens, end_token=self.end_token, initial_state=hidden)
+      print("sequence_lengths", sequence_lengths)
+      print("final_state, ", final_state)
+      print("final_state.alignment_history, ",
+            final_state.alignment_history)
+      print("final_state.alignment_history.stack(), ",
+            final_state.alignment_history.stack())
+      print("EVALUATION - Outputs", outputs.sample_id.shape)
+      return outputs
+    else:
+      raise NotImplementedError(
+                "Call is currently not implemented with training set to {}".format(training))

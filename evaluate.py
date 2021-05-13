@@ -90,33 +90,13 @@ class QuestionGenerator(tf.keras.Model):
             enc_out, enc_hidden = self.encoder(
                 inp, enc_start_state, training=False)
 
-            start_tokens = tf.fill(
-                [inference_batch_size], self.targ_tokenizer.word_index['<start>'])
-            end_token = self.targ_tokenizer.word_index['<end>']
-
             # Setup Memory in decoder stack
             self.decoder.attention_mechanism.setup_memory(enc_out)
-
             # set decoder_initial_state
             decoder_initial_state = self.decoder.build_initial_state(
                 inference_batch_size, enc_hidden, tf.float32)
 
-            # Since the BasicDecoder wraps around Decoder's rnn cell only, you have to ensure that the inputs to BasicDecoder
-            # decoding step is output of embedding layer. tfa.seq2seq.GreedyEmbeddingSampler() takes care of this.
-            # You only need to get the weights of embedding layer, which can be done by decoder.embedding.variables[0] and pass this callabble to BasicDecoder's call() function
-
-            decoder_embedding_matrix = self.decoder.embedding.variables[0]
-            print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
-
-            outputs, final_state, sequence_lengths = self.decoder.inference_decoder(
-                decoder_embedding_matrix, start_tokens=start_tokens, end_token=end_token, initial_state=decoder_initial_state, sequence_length=inference_batch_size*[20-1])
-            print("final_state, ", final_state)
-            print("final_state.alignment_history, ",
-                  final_state.alignment_history)
-            print("final_state.alignment_history.stack(), ",
-                  final_state.alignment_history.stack())
-            print("EVALUATION - Outputs", outputs.sample_id.shape)
-            return outputs
+            self.decoder(None, decoder_initial_state, training=False)
 
         else:
             raise NotImplementedError(
