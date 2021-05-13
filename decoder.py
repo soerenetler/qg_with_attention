@@ -27,7 +27,7 @@ class Decoder(tf.keras.layers.Layer):
 
     # Create attention mechanism with memory = None
     self.attention_mechanism = self.build_attention_mechanism(self.dec_units, 
-                                                              None, self.batch_sz*[self.max_length_inp], self.attention_type)
+                                                              None, self.batch_sz*[self.max_length_inp-1], self.attention_type)
 
     # Wrap attention mechanism with the fundamental rnn cell of decoder
     self.rnn_cell = tfa.seq2seq.AttentionWrapper(self.gru, 
