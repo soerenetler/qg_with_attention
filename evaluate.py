@@ -37,22 +37,25 @@ class QuestionGenerator(tf.keras.Model):
 
         return {m.name: m.result() for m in self.metrics}
 
-    def call(self, qg_inputs, training=True):
-        inp, targ = qg_inputs
-        batch_sz = inp.shape[0]
+    def call(self, qg_inputs, training=None):
+        if training:
+            inp, targ = qg_inputs
+            batch_sz = inp.shape[0]
 
-        dec_input = targ[ : , :-1 ] # Ignore <end> token
+            dec_input = targ[ : , :-1 ] # Ignore <end> token
 
-        enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
-        enc_output, enc_hidden = self.encoder(inp, enc_hidden, training=training)
-        # Set the AttentionMechanism object with encoder_outputs
-        self.decoder.attention_mechanism.setup_memory(enc_output)
+            enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
+            enc_output, enc_hidden = self.encoder(inp, enc_hidden, training=training)
+            # Set the AttentionMechanism object with encoder_outputs
+            self.decoder.attention_mechanism.setup_memory(enc_output)
 
-        # Create AttentionWrapperState as initial_state for decoder
-        decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
-        pred = self.decoder(dec_input, decoder_initial_state)
+            # Create AttentionWrapperState as initial_state for decoder
+            decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
+            pred = self.decoder(dec_input, decoder_initial_state)
 
-        return pred
+            return pred
+        else:
+            raise NotImplementedError("Call is currently not implemented with training set to {}".format(training))
 
 
     def evaluate_sentence(self, sentence):
