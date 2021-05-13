@@ -134,7 +134,7 @@ callbacks = [
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
-qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks, validation_data=dataset_val)
+qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks, validation_data=dataset_val, steps_per_epoch=1)
 
 qg.save(path_to_model+"saved_model/")
 
