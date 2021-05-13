@@ -2,8 +2,8 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 class Decoder(tf.keras.layers.Layer):
-  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=20, max_length_targ=80):
-    super(Decoder, self).__init__()
+  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, attention_type='luong', max_length_inp=20, max_length_targ=80, **kwargs):
+    super(Decoder, self).__init__(**kwargs)
     self.batch_sz = batch_sz
     self.dec_units = dec_units
     self.attention_type = attention_type

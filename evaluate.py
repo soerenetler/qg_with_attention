@@ -3,8 +3,8 @@ import tensorflow_addons as tfa
 from utils import plot_attention
 
 class QuestionGenerator(tf.keras.Model):
-    def __init__(self, qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp):
-        super(QuestionGenerator, self).__init__()
+    def __init__(self, qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp, **kwargs):
+        super(QuestionGenerator, self).__init__(**kwargs)
         self.qg_dataset = qg_dataset
         self.inp_tokenizer = inp_tokenizer
         self.encoder = encoder
