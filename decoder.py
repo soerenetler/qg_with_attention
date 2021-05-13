@@ -24,7 +24,7 @@ class Decoder(tf.keras.layers.Layer):
     self.fc = tf.keras.layers.Dense(vocab_size)
 
     # Sampler
-    self.train_sampler = tfa.seq2seq.sampler.TrainingSampler()
+    self.train_sampler = tfa.seq2seq.TrainingSampler()
     self.inference_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
 
     # Create attention mechanism with memory = None
