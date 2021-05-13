@@ -151,7 +151,7 @@ qg.compile(optimizer=optimizer, loss=loss_function)
 #qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks)#, validation_data=dataset_val)
 
-qg.save(path_to_model+"saved_model/")
+#qg.save(path_to_model+"saved_model/")
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three',
              'album', 'deal', 'with', ',', 'which', 'left', '.'], attention_plot_folder=path_to_model)
