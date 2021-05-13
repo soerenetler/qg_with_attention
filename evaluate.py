@@ -1,5 +1,4 @@
 import tensorflow as tf
-from tensorflow.python.keras.engine import training
 import tensorflow_addons as tfa
 from utils import plot_attention
 
@@ -18,13 +17,10 @@ class QuestionGenerator(tf.keras.Model):
     def train_step(self, data):
         inp, targ = data
         loss = 0
-        batch_sz = inp.shape[0]
-        enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
+        
         with tf.GradientTape() as tape:
-            dec_input = targ[ : , :-1 ] # Ignore <end> token
+            pred = self(inp, targ)
             real = targ[ : , 1: ]         # ignore <start> token
-
-            pred = self(inp, enc_hidden, dec_input)
 
             print("TRAIN - pred.rnn_output ", pred.rnn_output.shape)
             logits = pred.rnn_output
@@ -41,7 +37,12 @@ class QuestionGenerator(tf.keras.Model):
 
         return {m.name: m.result() for m in self.metrics}
 
-    def call(self, inp, enc_hidden, dec_input):
+    def call(self, inp, targ):
+        batch_sz = inp.shape[0]
+
+        dec_input = targ[ : , :-1 ] # Ignore <end> token
+
+        enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
         enc_output, enc_hidden = self.encoder(inp, enc_hidden, training=True)
         # Set the AttentionMechanism object with encoder_outputs
         self.decoder.attention_mechanism.setup_memory(enc_output)
@@ -49,6 +50,8 @@ class QuestionGenerator(tf.keras.Model):
         # Create AttentionWrapperState as initial_state for decoder
         decoder_initial_state = self.decoder.build_initial_state(self.encoder.batch_sz, enc_hidden, tf.float32)
         pred = self.decoder(dec_input, decoder_initial_state)
+
+        return pred
 
 
     def evaluate_sentence(self, sentence):
