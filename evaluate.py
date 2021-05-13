@@ -57,7 +57,7 @@ class QuestionGenerator(tf.keras.Model):
         elif training == False:
             print("qg_inputs:", qg_inputs)
             print("len(qg_inputs):", len(qg_inputs))
-            if len(qg_inputs)==1:
+            if type(qg_inputs)==tf.Tensor:
                 inp = qg_inputs
             elif len(qg_inputs)==2:
                 inp, _ = qg_inputs
