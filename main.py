@@ -5,10 +5,12 @@ import tensorflow as tf
 
 from decoder import Decoder
 from encoder import Encoder
-from evaluate import QuestionGenerator
+from model import QuestionGenerator
 from qg_dataset import QGDataset
 from utils import convert, generate_embeddings_matrix, loss_function
-from bleu_score import BleuScore
+#from bleu_score import BleuScore
+
+from copynet_tf.metrics import BLEU
 
 # PARAMS
 import argparse
@@ -143,7 +145,7 @@ callbacks = [
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer, loss=loss_function)
+qg.compile(optimizer=optimizer, loss=loss_function, metrics=BLEU())
 qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 qg.summary()
 qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks)#, validation_data=dataset_val)
