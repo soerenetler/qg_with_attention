@@ -11,7 +11,6 @@ from qg_dataset import QGDataset
 from utils import convert, generate_embeddings_matrix, loss_function
 #from bleu_score import BleuScore
 
-from copynet_tf.metrics import BLEU
 
 # PARAMS
 import argparse
