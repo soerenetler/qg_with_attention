@@ -127,13 +127,13 @@ class QuestionGenerator(tf.keras.Model):
         inputs = tf.convert_to_tensor(inputs)
 
         if beam_width==0:
-            outputs = self((inputs, None), training=False)
+            outputs = self((inputs, None), training=False).sample_id
         else:
             outputs = self.beam_evaluate_sentences(inputs, beam_width=beam_width)
 
         print(outputs)
         result_str = self.targ_tokenizer.sequences_to_texts(
-            outputs.sample_id.numpy())
+            outputs.numpy())
         #attention_matrix = final_state.alignment_history.stack()
 
         #plot_attention(attention_matrix[:,0,:], proc_sentence, result_str[0].split(" "), folder=attention_plot_folder)
@@ -213,7 +213,7 @@ class QuestionGenerator(tf.keras.Model):
         print("final_outputs.shape = (inference_batch_size, beam_width, time_step_outputs) ",
               final_outputs.shape)
 
-        return final_outputs.numpy()
+        return final_outputs
 
     #def beam_translate(self, sentence):
     #    result, beam_scores = self.beam_evaluate_sentences([sentence])
