@@ -115,7 +115,9 @@ class QuestionGenerator(tf.keras.Model):
             raise NotImplementedError(
                 "Call is currently not implemented with training set to {}".format(training))
 
-    def evaluate_sentence(self, sentences):
+
+
+    def translate(self, sentences, beam_width=0, attention_plot_folder=""):
         proc_sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
 
         inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
@@ -123,15 +125,15 @@ class QuestionGenerator(tf.keras.Model):
                                                                maxlen=self.max_length_inp,
                                                                padding='post')
         inputs = tf.convert_to_tensor(inputs)
-        outputs = self((inputs, None), training=False)
 
-        return outputs, None, proc_sentences
+        if beam_width==0:
+            outputs = self((inputs, None), training=False)
+        else:
+            outputs = self.beam_evaluate_sentences(inputs, beam_width=beam_width)
 
-    def translate(self, sentence, attention_plot_folder=""):
-        result, final_state, proc_sentences = self.evaluate_sentence(sentence)
-        print(result)
+        print(outputs)
         result_str = self.targ_tokenizer.sequences_to_texts(
-            result.sample_id.numpy())
+            outputs.sample_id.numpy())
         #attention_matrix = final_state.alignment_history.stack()
 
         #plot_attention(attention_matrix[:,0,:], proc_sentence, result_str[0].split(" "), folder=attention_plot_folder)
@@ -139,15 +141,7 @@ class QuestionGenerator(tf.keras.Model):
         #print('Input: %s' % (sentence))
         #print('Predicted translation: {}'.format(result_str))
 
-    def beam_evaluate_sentences(self, sentences, beam_width=3):
-        sentences = [self.qg_dataset.preprocess_sentence(
-            sentence) for sentence in sentences]
-
-        inputs = self.inp_tokenizer.texts_to_sequences(sentences)
-        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
-                                                               maxlen=self.max_length_inp,
-                                                               padding='post')
-        inputs = tf.convert_to_tensor(inputs)
+    def beam_evaluate_sentences(self, inputs, beam_width=3):
         inference_batch_size = inputs.shape[0]
 
         hidden = [tf.zeros((inference_batch_size, self.encoder.enc_units))]
@@ -219,17 +213,17 @@ class QuestionGenerator(tf.keras.Model):
         print("final_outputs.shape = (inference_batch_size, beam_width, time_step_outputs) ",
               final_outputs.shape)
 
-        return final_outputs.numpy(), beam_scores.numpy()
+        return final_outputs.numpy()
 
-    def beam_translate(self, sentence):
-        result, beam_scores = self.beam_evaluate_sentences([sentence])
-        print(result.shape, beam_scores.shape)
-        for beam, score in zip(result, beam_scores):
-            print(beam.shape, score.shape)
-            output = self.targ_tokenizer.sequences_to_texts(beam)
-            output = [a for a in output]
-            beam_score = [a.sum() for a in score]
-            print('Input: %s' % (sentence))
-            for i in range(len(output)):
-                print('{} Predicted translation: {}  {}'.format(
-                    i+1, output[i], beam_score[i]))
+    #def beam_translate(self, sentence):
+    #    result, beam_scores = self.beam_evaluate_sentences([sentence])
+    #    print(result.shape, beam_scores.shape)
+    #    for beam, score in zip(result, beam_scores):
+    #        print(beam.shape, score.shape)
+    #        output = self.targ_tokenizer.sequences_to_texts(beam)
+    #        output = [a for a in output]
+    #        beam_score = [a.sum() for a in score]
+    #        print('Input: %s' % (sentence))
+    #        for i in range(len(output)):
+    #            print('{} Predicted translation: {}  {}'.format(
+    #                i+1, output[i], beam_score[i]))

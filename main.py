@@ -145,7 +145,7 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer, loss=loss_function, metrics=BLEU())
+qg.compile(optimizer=optimizer, loss=loss_function)
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 #qg.summary()
 qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
@@ -159,15 +159,15 @@ qg.translate(["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capit
 qg.translate("the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "),
              attention_plot_folder=path_to_model)
 
-qg.beam_translate(
-    "the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "))
-qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
-                  'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'])
+qg.translate(
+    "the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "), beam_width=3)
+qg.translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
+                  'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'], beam_width=3)
 
 dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
 chunks = [dev_sentences[x:x+100] for x in range(0, len(dev_sentences), 100)]
 for chunk in chunks:
-    outputs = qg.translate(chunk)
+    outputs = qg.translate(chunk, beam_width=3)
 
     filename = modelname + ".txt"
 
