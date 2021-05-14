@@ -56,6 +56,9 @@ class QGDataset:
         #filters='',
         num_words=max_vocab,
         oov_token="<oov>")
+    lang_tokenizer.word_index['<pad>'] = 0
+    lang_tokenizer.index_word[0] = '<pad>'
+
     lang_tokenizer.fit_on_texts(lang)
 
     tensor = lang_tokenizer.texts_to_sequences(lang)

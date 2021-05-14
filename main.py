@@ -74,9 +74,11 @@ print("len target_tensor_dev", len(target_tensor_dev))
 
 print("Input Language; index to word mapping")
 convert(inp_tokenizer, input_tensor_dev[0])
+print(inp_tokenizer.word_index)
 print()
 print("Target Language; index to word mapping")
 convert(targ_tokenizer, target_tensor_dev[0])
+print(targ_tokenizer.word_index)
 
 embedding_dim = 300
 embedding_matrix = generate_embeddings_matrix(
@@ -145,7 +147,7 @@ qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
-qg.summary()
+#qg.summary()
 qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
 
 #qg.save(path_to_model+"saved_model/")
