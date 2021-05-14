@@ -11,7 +11,6 @@ from qg_dataset import QGDataset
 from utils import convert, generate_embeddings_matrix, loss_function
 #from bleu_score import BleuScore
 
-
 # PARAMS
 import argparse
 parser = argparse.ArgumentParser()

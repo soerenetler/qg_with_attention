@@ -181,7 +181,7 @@ class QuestionGenerator(tf.keras.Model):
 
         # Instantiate BeamSearchDecoder
         decoder_instance = tfa.seq2seq.BeamSearchDecoder(
-            self.decoder.rnn_cell, beam_width=beam_width, output_layer=self.decoder.fc, maximum_iterations=20)
+            self.decoder.rnn_cell, beam_width=beam_width, output_layer=self.decoder.fc, maximum_iterations=30)
         decoder_embedding_matrix = self.decoder.embedding.variables[0]
         print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
 
