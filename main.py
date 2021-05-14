@@ -1,5 +1,6 @@
 import os
 import time
+from numpy.testing._private.utils import assert_equal
 
 import tensorflow as tf
 
@@ -97,10 +98,12 @@ dataset_val = tf.data.Dataset.from_tensor_slices(
 dataset_val = dataset_val.batch(BATCH_SIZE, drop_remainder=True)
 
 example_input_batch, example_target_batch = next(iter(dataset))
-print("shape input_batch:", example_input_batch.shape)
-print("shape target_batch:", example_target_batch.shape)
+assert(example_input_batch.shape, (BATCH_SIZE, max_length_inp), "Shape of input batch should be (batch size, max_length_inp)")
+assert(example_target_batch.shape, (BATCH_SIZE, max_length_targ), "Shape of target batch should be (batch size, max_length_targ)")
 
 example_input_batch_val, example_target_batch_val = next(iter(dataset_val))
+assert(example_input_batch_val.shape, (BATCH_SIZE, max_length_inp), "Shape of input batch (val) should be (batch size, max_length_inp)")
+assert(example_target_batch_val.shape, (BATCH_SIZE, max_length_targ), "Shape of target batch (val) should be (batch size, max_length_targ)")
 print("shape input_batch_val:", example_input_batch_val.shape)
 print("shape target_batch_val:", example_target_batch_val.shape)
 
@@ -110,9 +113,8 @@ encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE,
 sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 sample_output, sample_hidden = encoder(
     example_input_batch, sample_hidden, training=True)
-print('Encoder output shape: (batch size, sequence length, units) {}'.format(
-    sample_output.shape))
-print('Encoder Hidden state shape: (batch size, units) {}'.format(sample_hidden.shape))
+assert_equal(sample_output.shape, (BATCH_SIZE, max_length_inp, units), "Shape of encoder output should be (batch size, sequence_length, units)")
+assert_equal(sample_hidden.shape, (BATCH_SIZE, units), "Shape of encoder hidden should be (batch size, units)")
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
                   targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  'luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ)
@@ -122,6 +124,7 @@ decoder.attention_mechanism.setup_memory(sample_output)
 initial_state = decoder.build_initial_state(
     BATCH_SIZE, sample_hidden, tf.float32)
 sample_decoder_outputs = decoder(sample_x, initial_state, training=True)
+assert_equal(sample_decoder_outputs.rnn_output.shape, (BATCH_SIZE, max_length_targ-1, vocab_tar_size))
 print("Decoder Outputs Shape: ", sample_decoder_outputs.rnn_output.shape)
 
 # Define the optimizer and the loss function
