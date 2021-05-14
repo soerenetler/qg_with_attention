@@ -22,9 +22,9 @@ parser.add_argument("-t", "--target_length", type=int, default=20,
                     help="max_length_targ")
 parser.add_argument("-i", "--input_length", type=int, default=80,
                     help="display a square of a given number")
-parser.add_argument("-x", "--vocab_input", type=int, default=45000,
+parser.add_argument("-x", "--vocab_input", type=int, default=None,#45000,
                     help="display a square of a given number")
-parser.add_argument("-y", "--max_vocab_targ", type=int, default=28000,
+parser.add_argument("-y", "--max_vocab_targ", type=int, default=None, #28000,
                     help="display a square of a given number")
 parser.add_argument("-e", "--epochs", type=int, default=1,
                     help="display a square of a given number")
@@ -135,29 +135,18 @@ checkpoint_dir = path_to_model + 'training_checkpoints'
 import datetime
 log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
-
-callbacks = [
-    tf.keras.callbacks.ModelCheckpoint(
-        # Path where to save the model
-        # The two parameters below mean that we will overwrite
-        # the current checkpoint if and only if
-        # the `val_loss` score has improved.
-        # The saved model name will include the current epoch.
-        filepath=checkpoint_dir + "/model_{epoch}",
+checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir + "/model_{epoch}",
         # save_best_only=True,  # Only save a model if `val_loss` has improved.
         # monitor="val_loss",
         verbose=1,
-    ), tensorboard_callback
-]
-
-
+    )
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 qg.summary()
-qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks, validation_data=dataset_val)
+qg.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
 
 #qg.save(path_to_model+"saved_model/")
 

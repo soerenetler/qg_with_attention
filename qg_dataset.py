@@ -52,7 +52,7 @@ class QGDataset:
 
     return zip(*sentence_pairs)
 
-  def tokenize(self, lang, maxlen, max_vocab):
+  def tokenize(self, lang, maxlen, max_vocab=None):
     lang_tokenizer = tf.keras.preprocessing.text.Tokenizer(
         #filters='',
         num_words=max_vocab,
@@ -75,8 +75,8 @@ class QGDataset:
     print(inp_lang_train[-1])
     print(targ_lang_train[-1])
 
-    input_tensor, inp_lang_tokenizer = self.tokenize(inp_lang_train, max_length_inp, max_vocab_inp)
-    target_tensor, targ_lang_tokenizer = self.tokenize(targ_lang_train, max_length_targ, max_vocab_targ)
+    input_tensor, inp_lang_tokenizer = self.tokenize(inp_lang_train, max_length_inp, max_vocab=max_vocab_inp)
+    target_tensor, targ_lang_tokenizer = self.tokenize(targ_lang_train, max_length_targ, max_vocab=max_vocab_targ)
 
     print("inp_lang_dev[0]: ", inp_lang_dev[0])
     print("targ_lang_dev[0] ", targ_lang_dev[0])
