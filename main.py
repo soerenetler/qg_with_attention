@@ -98,12 +98,12 @@ dataset_val = tf.data.Dataset.from_tensor_slices(
 dataset_val = dataset_val.batch(BATCH_SIZE, drop_remainder=True)
 
 example_input_batch, example_target_batch = next(iter(dataset))
-assert(example_input_batch.shape, (BATCH_SIZE, max_length_inp), "Shape of input batch should be (batch size, max_length_inp)")
-assert(example_target_batch.shape, (BATCH_SIZE, max_length_targ), "Shape of target batch should be (batch size, max_length_targ)")
+tf.debugging.assert_shapes([(example_input_batch, (BATCH_SIZE, max_length_inp))])
+tf.debugging.assert_shapes([(example_target_batch, (BATCH_SIZE, max_length_targ))])
 
 example_input_batch_val, example_target_batch_val = next(iter(dataset_val))
-assert(example_input_batch_val.shape, (BATCH_SIZE, max_length_inp), "Shape of input batch (val) should be (batch size, max_length_inp)")
-assert(example_target_batch_val.shape, (BATCH_SIZE, max_length_targ), "Shape of target batch (val) should be (batch size, max_length_targ)")
+assert_equal(example_input_batch_val.shape, (BATCH_SIZE, max_length_inp), "Shape of input batch (val) should be (batch size, max_length_inp)")
+assert_equal(example_target_batch_val.shape, (BATCH_SIZE, max_length_targ), "Shape of target batch (val) should be (batch size, max_length_targ)")
 print("shape input_batch_val:", example_input_batch_val.shape)
 print("shape target_batch_val:", example_target_batch_val.shape)
 
