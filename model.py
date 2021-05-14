@@ -24,7 +24,7 @@ class QuestionGenerator(tf.keras.Model):
 
             print("TRAIN - pred.rnn_output ", pred.rnn_output.shape)
             logits = pred.rnn_output
-            pred_token = pred.sample_id.tolist()
+            pred_token = pred.sample_id
             # Updates the metrics tracking the loss
             loss = self.compiled_loss(
                 real, logits, regularization_losses=self.losses)
@@ -46,7 +46,7 @@ class QuestionGenerator(tf.keras.Model):
         pred = self((inp, None), training=False)
         real = targ[:, 1:]
         logits = pred.rnn_output
-        pred_token = pred.sample_id.tolist()
+        pred_token = pred.sample_id
         # Updates the metrics tracking the loss
         self.compiled_loss(real, logits, regularization_losses=self.losses)
         # Update the metrics.
