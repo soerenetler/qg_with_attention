@@ -129,6 +129,10 @@ optimizer = tf.keras.optimizers.Adam()
 
 checkpoint_dir = path_to_model + 'training_checkpoints'
 
+import datetime
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
 callbacks = [
     tf.keras.callbacks.ModelCheckpoint(
         # Path where to save the model
@@ -140,12 +144,14 @@ callbacks = [
         # save_best_only=True,  # Only save a model if `val_loss` has improved.
         # monitor="val_loss",
         verbose=1,
-    )
+    ), tensorboard_callback
 ]
+
+
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer, loss=loss_function, metrics=BLEU())
+qg.compile(optimizer=optimizer, loss=loss_function)
 qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 qg.summary()
 qg.fit(dataset, epochs=EPOCHS, callbacks=callbacks)#, validation_data=dataset_val)
