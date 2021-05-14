@@ -20,7 +20,9 @@ class QuestionGenerator(tf.keras.Model):
 
         with tf.GradientTape() as tape:
             pred = self((inp, targ), training=True)
+            print("TRAIN - targ", targ[0])
             real = targ[:, 1:]         # ignore <start> token
+            print("Train - REAL", real[0])
 
             print("TRAIN - pred.rnn_output ", pred.rnn_output.shape)
             logits = pred.rnn_output
@@ -44,7 +46,11 @@ class QuestionGenerator(tf.keras.Model):
         inp, targ = data
         # Compute predictions
         pred = self((inp, None), training=False)
+        print("TEST - targ", targ[0])
         real = targ[:, 1:]
+
+        print("TEST - REAL", real[0])
+
         logits = pred.rnn_output
         pred_token = pred.sample_id
         # Updates the metrics tracking the loss
