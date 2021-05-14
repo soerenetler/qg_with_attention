@@ -146,7 +146,7 @@ qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
 qg.compile(optimizer=optimizer, loss=loss_function)
 qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 qg.summary()
-qg.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
+qg.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback, tensorboard_callback])#, validation_data=dataset_val)
 
 #qg.save(path_to_model+"saved_model/")
 
@@ -165,8 +165,7 @@ qg.beam_translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
 dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
 chunks = [dev_sentences[x:x+100] for x in range(0, len(dev_sentences), 100)]
 for chunk in chunks:
-    result, beam_scores = qg.beam_evaluate_sentences(chunk)
-    outputs = qg.targ_tokenizer.sequences_to_texts(result[0])
+    outputs = qg.translate(chunk)
 
     filename = modelname + ".txt"
 

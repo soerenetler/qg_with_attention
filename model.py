@@ -115,60 +115,29 @@ class QuestionGenerator(tf.keras.Model):
             raise NotImplementedError(
                 "Call is currently not implemented with training set to {}".format(training))
 
-    def evaluate_sentence(self, sentence):
-        proc_sentence = self.qg_dataset.preprocess_sentence(sentence)
+    def evaluate_sentence(self, sentences):
+        proc_sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
 
-        inputs = self.inp_tokenizer.texts_to_sequences([proc_sentence])
-        # inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
-        #                                                        maxlen=self.max_length_inp,
-        #                                                        padding='post')
+        inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
+        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
+                                                               maxlen=self.max_length_inp,
+                                                               padding='post')
         inputs = tf.convert_to_tensor(inputs)
         outputs = self((inputs, None), training=False)
 
-        #inference_batch_size = inputs.shape[0]
-
-        #enc_start_state = [tf.zeros((inference_batch_size, self.encoder.enc_units))]
-        #enc_out, enc_hidden = self.encoder(inputs, enc_start_state, training=False)
-
-        #dec_hidden = enc_hidden
-
-        #start_tokens = tf.fill([inference_batch_size], self.targ_tokenizer.word_index['<start>'])
-        #end_token = self.targ_tokenizer.word_index['<end>']
-
-        #greedy_sampler = tfa.seq2seq.GreedyEmbeddingSampler()
-
-        # Instantiate BasicDecoder object
-        #decoder_instance = tfa.seq2seq.BasicDecoder(cell=self.decoder.rnn_cell, sampler=greedy_sampler, output_layer=self.decoder.fc, maximum_iterations=20)
-        # Setup Memory in decoder stack
-        # self.decoder.attention_mechanism.setup_memory(enc_out)
-
-        # set decoder_initial_state
-        #decoder_initial_state = self.decoder.build_initial_state(inference_batch_size, dec_hidden, tf.float32)
-
-        # Since the BasicDecoder wraps around Decoder's rnn cell only, you have to ensure that the inputs to BasicDecoder
-        # decoding step is output of embedding layer. tfa.seq2seq.GreedyEmbeddingSampler() takes care of this.
-        # You only need to get the weights of embedding layer, which can be done by decoder.embedding.variables[0] and pass this callabble to BasicDecoder's call() function
-
-        #decoder_embedding_matrix = self.decoder.embedding.variables[0]
-        #print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
-
-        #outputs, final_state, sequence_lengths= decoder_instance(decoder_embedding_matrix, start_tokens = start_tokens, end_token= end_token, initial_state=decoder_initial_state)
-        #print("final_state, ", final_state)
-        #print("final_state.alignment_history, ", final_state.alignment_history)
-        #print("final_state.alignment_history.stack(), ", final_state.alignment_history.stack())
-
-        return outputs, None, proc_sentence
+        return outputs, None, proc_sentences
 
     def translate(self, sentence, attention_plot_folder=""):
-        result, final_state, proc_sentence = self.evaluate_sentence(sentence)
+        result, final_state, proc_sentences = self.evaluate_sentence(sentence)
         print(result)
         result_str = self.targ_tokenizer.sequences_to_texts(
             result.sample_id.numpy())
         #attention_matrix = final_state.alignment_history.stack()
 
         #plot_attention(attention_matrix[:,0,:], proc_sentence, result_str[0].split(" "), folder=attention_plot_folder)
-        print('Input: %s' % (sentence))
-        print('Predicted translation: {}'.format(result_str))
+        return result_str
+        #print('Input: %s' % (sentence))
+        #print('Predicted translation: {}'.format(result_str))
 
     def beam_evaluate_sentences(self, sentences, beam_width=3):
         sentences = [self.qg_dataset.preprocess_sentence(
