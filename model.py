@@ -92,11 +92,16 @@ class QuestionGenerator(tf.keras.Model):
                     "Input has a length of {}.".format(len(qg_inputs)))
 
             inference_batch_size = inp.shape[0]
+            length_inp = inp.shape[1]
 
             enc_start_state = self.encoder.initialize_hidden_state(
                 inference_batch_size)
+            tf.debugging.assert_shapes([(enc_start_state,(inference_batch_size, self.encoder.enc_units))])
             enc_out, enc_hidden = self.encoder(
                 inp, enc_start_state, training=False)
+
+            tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
+                                        (enc_hidden, (inference_batch_size, self.encoder.enc_units))])
 
             # Setup Memory in decoder stack
             self.decoder.attention_mechanism.setup_memory(enc_out)

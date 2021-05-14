@@ -49,7 +49,6 @@ class QGDataset:
 
     sentence_pairs = zip(df["answer_sentence_token"].apply(self.preprocess_sentence), df["question_token"].apply(self.preprocess_sentence))
     
-
     return zip(*sentence_pairs)
 
   def tokenize(self, lang, maxlen, max_vocab=None):
