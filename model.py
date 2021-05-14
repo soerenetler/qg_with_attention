@@ -127,7 +127,7 @@ class QuestionGenerator(tf.keras.Model):
         inputs = tf.convert_to_tensor(inputs)
 
         if beam_width==0:
-            outputs = self((inputs, None), training=False).sample_id.numpy
+            outputs = self((inputs, None), training=False).sample_id.numpy()
         else:
             outputs = self.beam_evaluate_sentences(inputs, beam_width=beam_width).numpy()
 
