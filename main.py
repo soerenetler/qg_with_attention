@@ -145,7 +145,7 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
-qg.compile(optimizer=optimizer, loss=loss_function)
+qg.compile(optimizer=optimizer, loss=loss_function, metrics=BLEU())
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 #qg.summary()
 qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
