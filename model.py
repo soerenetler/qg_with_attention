@@ -54,7 +54,7 @@ class QuestionGenerator(tf.keras.Model):
         logits = pred.rnn_output
         pred_token = pred.sample_id
         # Updates the metrics tracking the loss
-        self.compiled_loss(real, logits, regularization_losses=self.losses)
+        # self.compiled_loss(real, logits, regularization_losses=self.losses)
         # Update the metrics.
         self.compiled_metrics.update_state(real, pred_token)
         # Return a dict mapping metric names to current value.
