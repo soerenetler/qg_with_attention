@@ -38,7 +38,7 @@ class Decoder(tf.keras.layers.Layer):
     # Define the decoder with respect to fundamental rnn cell
     self.train_decoder = tfa.seq2seq.BasicDecoder(self.rnn_cell, sampler=self.train_sampler, output_layer=self.fc)
     # Instantiate BasicDecoder object
-    self.inference_decoder = tfa.seq2seq.BasicDecoder(cell=self.rnn_cell, sampler=self.inference_sampler, output_layer=self.fc, maximum_iterations=30)
+    self.inference_decoder = tfa.seq2seq.BasicDecoder(cell=self.rnn_cell, sampler=self.inference_sampler, output_layer=self.fc)#, maximum_iterations=30)
 
   def build_attention_mechanism(self, dec_units, memory, memory_sequence_length, attention_type='luong'):
     # ------------- #

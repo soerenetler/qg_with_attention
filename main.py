@@ -146,7 +146,7 @@ qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
 qg.compile(optimizer=optimizer, loss=loss_function)
 qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 qg.summary()
-qg.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
+qg.fit(dataset, epochs=EPOCHS, callbacks=[checkpoint_callback, tensorboard_callback])#, validation_data=dataset_val)
 
 #qg.save(path_to_model+"saved_model/")
 
