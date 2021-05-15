@@ -113,7 +113,7 @@ class QuestionGenerator(tf.keras.Model):
                 self.decoder.attention_mechanism.setup_memory(enc_out)
                 # set decoder_initial_state
                 pred = self.decoder(None, enc_hidden, training=False)
-                return pred.sample_id
+                return pred
 
             #use BeamSearch
             elif beam_width > 1:
@@ -183,7 +183,7 @@ class QuestionGenerator(tf.keras.Model):
                 print("final_outputs.shape = (inference_batch_size, beam_width, time_step_outputs) ",
                     final_outputs.shape)
 
-                return final_outputs[:,0,:]
+                return outputs
 
         else:
             raise NotImplementedError(
@@ -200,7 +200,18 @@ class QuestionGenerator(tf.keras.Model):
                                                                padding='post')
         inputs = tf.convert_to_tensor(inputs)
 
-        outputs = self((inputs, None), training=False, beam_width=beam_width).numpy()
+        if beam_width ==1:
+            outputs = self((inputs, None), training=False, beam_width=beam_width).predicted_id.numpy()
+        if beam_width > 1:
+            outputs = self((inputs, None), training=False, beam_width=beam_width).predicted_id.numpy()
+            final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
+            beam_scores = tf.transpose(
+                outputs.beam_search_decoder_output.scores, perm=(0, 2, 1))
+
+            print("final_outputs.shape = (inference_batch_size, beam_width, time_step_outputs) ",
+                final_outputs.shape)
+            final_outputs[:,0,:]
+
 
         print(outputs)
         result_str = self.targ_tokenizer.sequences_to_texts(outputs)
