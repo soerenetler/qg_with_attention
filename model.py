@@ -218,7 +218,7 @@ class QuestionGenerator(tf.keras.Model):
 
             print("final_outputs.shape = (inference_batch_size, beam_width, time_step_outputs) ",
                 final_outputs.shape)
-            final_outputs[:,0,:]
+            outputs = final_outputs[:,0,:]
 
 
         print(outputs)
