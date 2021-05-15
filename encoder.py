@@ -40,5 +40,7 @@ class Encoder(tf.keras.layers.Layer):
         result = self.gru(
             x, training=training)
         output = result[0]
+        for i, tensor in enumerate(result):
+            tf.print("result {} ---- {}".format(i, tensor))
         state = [tf.concat(result[i:i+2], 1) for i in range(len(result[1:]) - 1)]
         return output, state
