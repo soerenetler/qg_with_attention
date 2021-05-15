@@ -3,6 +3,7 @@ import time
 from numpy.testing._private.utils import assert_equal
 
 import tensorflow as tf
+import glob
 
 from decoder import Decoder
 from encoder import Encoder
@@ -43,6 +44,17 @@ path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" 
     args.dataset + "/question_answer/"
 path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + \
     args.dataset + "/" + modelname + "/"
+
+filelist = glob.glob(os.path.join(path_to_model, "*"))
+for f in filelist:
+    os.remove(f)
+
+path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + args.dataset + "/"+ modelname + "/"
+
+filelist = glob.glob(os.path.join(path_to_logs, "*"))
+for f in filelist:
+    os.remove(f)
+
 path_to_glove_file = "/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt"
 max_length_targ = args.target_length
 max_length_inp = args.input_length
@@ -133,8 +145,7 @@ optimizer = tf.keras.optimizers.Adam()
 checkpoint_dir = path_to_model + 'training_checkpoints'
 
 import datetime
-log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=path_to_logs, histogram_freq=1)
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir + "/model_{epoch}",
         # save_best_only=True,  # Only save a model if `val_loss` has improved.
         # monitor="val_loss",
