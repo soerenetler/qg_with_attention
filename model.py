@@ -104,7 +104,7 @@ class QuestionGenerator(tf.keras.Model):
                 inp, enc_start_state, training=False)
             
             if self.encoder.bidirectional:
-                tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
+                tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
                                             (enc_hidden, (inference_batch_size, self.encoder.enc_units*2))])
             else:
                 tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
