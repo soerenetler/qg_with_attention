@@ -20,7 +20,7 @@ class Encoder(tf.keras.layers.Layer):
                                        return_sequences=True,
                                        return_state=True,
                                        recurrent_initializer='glorot_uniform',
-                                       dropout=0.3)  # TODO I need to make this bidirectional
+                                       dropout=0.3)
         if self.bidirectional:
             self.gru = tf.keras.layers.Bidirectional(self.gru)
 

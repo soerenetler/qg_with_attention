@@ -92,8 +92,11 @@ print("Target Language; index to word mapping")
 convert(targ_tokenizer, target_tensor_dev[0])
 
 embedding_dim = 300
-embedding_matrix = generate_embeddings_matrix(
+inp_embedding_matrix = generate_embeddings_matrix(
     path_to_glove_file, inp_tokenizer, embedding_dim=embedding_dim)
+
+targ_embedding_matrix = generate_embeddings_matrix(
+    path_to_glove_file, targ_tokenizer, embedding_dim=embedding_dim)
 
 # Create a tf.data dataset
 BUFFER_SIZE = len(input_tensor_train)
@@ -119,7 +122,7 @@ tf.debugging.assert_shapes([(example_input_batch_val, (BATCH_SIZE, max_length_in
 tf.debugging.assert_shapes([(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
 encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE,
-                  bidirectional=True, embedding_matrix=embedding_matrix)
+                  bidirectional=True, embedding_matrix=inp_embedding_matrix)
 # sample input
 sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 sample_output, sample_hidden = encoder(
@@ -128,7 +131,7 @@ tf.debugging.assert_shapes([(sample_output, (BATCH_SIZE, max_length_inp, units))
 tf.debugging.assert_shapes([(sample_hidden, (BATCH_SIZE, units))])
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
-                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  'luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ)
+                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix)
 sample_x = tf.random.uniform(
     (BATCH_SIZE, max_length_targ), dtype=tf.dtypes.float32)
 decoder.attention_mechanism.setup_memory(sample_output)

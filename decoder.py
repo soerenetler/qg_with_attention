@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 
 class Decoder(tf.keras.layers.Layer):
-  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, attention_type='luong', max_length_inp=80, max_length_targ=20, **kwargs):
+  def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, attention_type='luong', max_length_inp=80, max_length_targ=20, embedding_matrix=None, **kwargs):
     super(Decoder, self).__init__(**kwargs)
     self.batch_sz = batch_sz
     self.dec_units = dec_units
@@ -13,7 +13,10 @@ class Decoder(tf.keras.layers.Layer):
     self.end_token = end_token
 
     # Embedding Layer
-    self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
+    self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim,
+                                                   embeddings_initializer=tf.keras.initializers.Constant(
+                                                       embedding_matrix),
+                                                   trainable=False)
 
     # Define the fundamental cell for decoder recurrent structure
     self.gru = tf.keras.layers.GRUCell(self.dec_units,
