@@ -3,7 +3,7 @@ import time
 from numpy.testing._private.utils import assert_equal
 
 import tensorflow as tf
-import glob
+import shutil
 
 from decoder import Decoder
 from encoder import Encoder
@@ -45,15 +45,11 @@ path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" 
 path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + \
     args.dataset + "/" + modelname + "/"
 
-filelist = glob.glob(os.path.join(path_to_model, "*"))
-for f in filelist:
-    os.remove(f)
+shutil.rmtree(path_to_model)
 
 path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + args.dataset + "/"+ modelname + "/"
 
-filelist = glob.glob(os.path.join(path_to_logs, "*"))
-for f in filelist:
-    os.remove(f)
+shutil.rmtree(path_to_logs)
 
 path_to_glove_file = "/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt"
 max_length_targ = args.target_length
