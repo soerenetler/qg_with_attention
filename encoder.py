@@ -42,5 +42,5 @@ class Encoder(tf.keras.layers.Layer):
         output = result[0]
         for i, tensor in enumerate(result):
             tf.print("result {} ---- {}".format(i, tensor.shape))
-        state = (tf.concat(result[i:i+2], 1) for i in range(1, len(result[1:]) - 1))
+        state = tuple([tf.concat(result[i:i+2], 1) for i in range(1, len(result[1:]) - 1)])
         return output, state
