@@ -96,7 +96,10 @@ class QuestionGenerator(tf.keras.Model):
 
             enc_start_state = self.encoder.initialize_hidden_state(
                 inference_batch_size)
-            tf.debugging.assert_shapes([(enc_start_state,(inference_batch_size, self.encoder.enc_units))])
+            if self.encoder.bidirectional:
+                tf.debugging.assert_shapes([(enc_start_state,(2, inference_batch_size, self.encoder.enc_units))])
+            else:
+                tf.debugging.assert_shapes([(enc_start_state,(inference_batch_size, self.encoder.enc_units))])
             enc_out, enc_hidden = self.encoder(
                 inp, enc_start_state, training=False)
 
