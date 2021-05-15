@@ -5,7 +5,7 @@ class Encoder(tf.keras.layers.Layer):
         super(Encoder, self).__init__(**kwargs)
         self.bidirectional = bidirectional
         if self.bidirectional:
-            self.enc_units = enc_units/2
+            self.enc_units = int(enc_units/2)
         else:
             self.enc_units = enc_units
         self.batch_sz = batch_sz
