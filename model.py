@@ -86,7 +86,7 @@ class QuestionGenerator(tf.keras.Model):
             if type(qg_inputs) == tf.Tensor:
                 inp = qg_inputs
             elif len(qg_inputs) == 2:
-                inp, _ = qg_inputs
+                inp, targ = qg_inputs
             else:
                 raise NotImplementedError(
                     "Input has a length of {}.".format(len(qg_inputs)))
@@ -105,13 +105,15 @@ class QuestionGenerator(tf.keras.Model):
             
             # use teacher forcing
             if beam_width == None:
+                dec_input = targ[:, :-1]  # Ignore <end> token
+
                 # Set the AttentionMechanism object with encoder_outputs
                 self.decoder.attention_mechanism.setup_memory(enc_out)
 
                 # Create AttentionWrapperState as initial_state for decoder
                 decoder_initial_state = self.decoder.build_initial_state(
                     self.encoder.batch_sz, enc_hidden, tf.float32)
-                pred = self.decoder(enc_hidden, decoder_initial_state, training=True)
+                pred = self.decoder(dec_input, decoder_initial_state, training=True)
 
                 return pred
 
