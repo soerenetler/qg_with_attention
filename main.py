@@ -130,7 +130,7 @@ tf.debugging.assert_shapes(
 tf.debugging.assert_shapes(
     [(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
-encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE,
+encoder = Encoder(vocab_inp_size, embedding_dim, units,
                   bidirectional=True, embedding_matrix=inp_embedding_matrix, layer=layer)
 # sample input
 sample_output, sample_hidden = encoder(
