@@ -209,7 +209,7 @@ class QuestionGenerator(tf.keras.Model):
         inputs = tf.convert_to_tensor(inputs)
 
         if beam_width ==1:
-            outputs = self((inputs, None), training=False, beam_width=beam_width).predicted_id.numpy()
+            outputs = self((inputs, None), training=False, beam_width=beam_width).sample_id.numpy()
         if beam_width > 1:
             outputs = self((inputs, None), training=False, beam_width=beam_width).predicted_id.numpy()
             final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
