@@ -1,9 +1,11 @@
 import tensorflow as tf
 
 class Encoder(tf.keras.layers.Layer):
-    def __init__(self, vocab_size, embedding_dim, enc_units, batch_sz, embedding_matrix, bidirectional=False, **kwargs):
+    def __init__(self, vocab_size, embedding_dim, enc_units, batch_sz, embedding_matrix, bidirectional=False, layer=1, **kwargs):
         super(Encoder, self).__init__(**kwargs)
         self.bidirectional = bidirectional
+        self.layer = layer
+
         if self.bidirectional:
             self.enc_units = int(enc_units/2)
         else:
@@ -16,13 +18,23 @@ class Encoder(tf.keras.layers.Layer):
                                                        embedding_matrix),
                                                    trainable=False)
 
-        self.gru = tf.keras.layers.GRU(self.enc_units,
-                                       return_sequences=True,
-                                       return_state=True,
-                                       recurrent_initializer='glorot_uniform',
-                                       dropout=0.3)
+        if self.layer == 1:
+            self.gru = tf.keras.layers.GRU(self.enc_units,
+                                        return_sequences=True,
+                                        return_state=True,
+                                        dropout=0.3)
+        elif self.layer >1:
+            rnn_cells = [tf.keras.layers.GRUCell(self.enc_units, dropout=0.3) for _ in range(2)]
+            stacked_gru = tf.keras.layers.StackedRNNCells(rnn_cells)
+            self.gru = tf.keras.layers.RNN(stacked_gru, return_sequences=True,
+                                        return_state=True)
+        else:
+            raise NotImplementedError("Layer in encoder: {}".format(self.layer))
+        
+
         if self.bidirectional:
             self.gru = tf.keras.layers.Bidirectional(self.gru)
+
 
     def call(self, x, hidden, training=False):
         x = self.embedding(x)

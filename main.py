@@ -1,3 +1,4 @@
+import datetime
 import os
 import time
 from unicodedata import bidirectional
@@ -31,6 +32,8 @@ parser.add_argument("-u", "--units", type=int, default=600,
                     help="display a square of a given number")
 parser.add_argument("-b", "--batch", type=int, default=64,
                     help="display a square of a given number")
+parser.add_argument("-l", "--layer", type=int, default=1,
+                    help="display a square of a given number")
 args = parser.parse_args()
 
 print(args)
@@ -50,7 +53,8 @@ try:
 except FileNotFoundError:
     print("Directory does not excist: {}".format(path_to_model))
 
-path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + args.dataset + "/"+ modelname + "/"
+path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + \
+    args.dataset + "/" + modelname + "/"
 
 try:
     shutil.rmtree(path_to_logs)
@@ -63,6 +67,7 @@ max_length_targ = args.target_length
 max_length_inp = args.input_length
 max_vocab_inp = args.vocab_input
 max_vocab_targ = args.max_vocab_targ
+layer = args.layer
 EPOCHS = args.epochs
 BATCH_SIZE = args.batch
 units = args.units
@@ -114,53 +119,60 @@ dataset_val = tf.data.Dataset.from_tensor_slices(
 dataset_val = dataset_val.batch(BATCH_SIZE, drop_remainder=True)
 
 example_input_batch, example_target_batch = next(iter(dataset))
-tf.debugging.assert_shapes([(example_input_batch, (BATCH_SIZE, max_length_inp))])
-tf.debugging.assert_shapes([(example_target_batch, (BATCH_SIZE, max_length_targ))])
+tf.debugging.assert_shapes(
+    [(example_input_batch, (BATCH_SIZE, max_length_inp))])
+tf.debugging.assert_shapes(
+    [(example_target_batch, (BATCH_SIZE, max_length_targ))])
 
 example_input_batch_val, example_target_batch_val = next(iter(dataset_val))
-tf.debugging.assert_shapes([(example_input_batch_val, (BATCH_SIZE, max_length_inp))])
-tf.debugging.assert_shapes([(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
+tf.debugging.assert_shapes(
+    [(example_input_batch_val, (BATCH_SIZE, max_length_inp))])
+tf.debugging.assert_shapes(
+    [(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
 encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE,
-                  bidirectional=True, embedding_matrix=inp_embedding_matrix)
+                  bidirectional=True, embedding_matrix=inp_embedding_matrix, layer=layer)
 # sample input
 sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 sample_output, sample_hidden = encoder(
     example_input_batch, sample_hidden, training=True)
-tf.debugging.assert_shapes([(sample_output, (BATCH_SIZE, max_length_inp, units))])
+tf.debugging.assert_shapes(
+    [(sample_output, (BATCH_SIZE, max_length_inp, units))])
 tf.debugging.assert_shapes([(sample_hidden, (BATCH_SIZE, units))])
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
-                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix)
+                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix, layer=layer)
 sample_x = tf.random.uniform(
     (BATCH_SIZE, max_length_targ), dtype=tf.dtypes.float32)
 decoder.attention_mechanism.setup_memory(sample_output)
 initial_state = decoder.build_initial_state(
     BATCH_SIZE, sample_hidden, tf.float32)
 sample_decoder_outputs = decoder(sample_x, initial_state, training=True)
-tf.debugging.assert_shapes([(sample_decoder_outputs.rnn_output, (BATCH_SIZE, max_length_targ-1, vocab_tar_size))])
+tf.debugging.assert_shapes(
+    [(sample_decoder_outputs.rnn_output, (BATCH_SIZE, max_length_targ-1, vocab_tar_size))])
 
 # Define the optimizer and the loss function
 optimizer = tf.keras.optimizers.Adam()
 
 checkpoint_dir = path_to_model + 'training_checkpoints'
 
-import datetime
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=path_to_logs, histogram_freq=1)
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir=path_to_logs, histogram_freq=1)
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir + "/model_{epoch}",
-        # save_best_only=True,  # Only save a model if `val_loss` has improved.
-        # monitor="val_loss",
-        verbose=1,
-    )
+                                                         # save_best_only=True,  # Only save a model if `val_loss` has improved.
+                                                         # monitor="val_loss",
+                                                         verbose=1,
+                                                         )
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
                        decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
-#qg.summary()
-qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
+# qg.summary()
+qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[
+       checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
 
-#qg.save(path_to_model+"saved_model/")
+# qg.save(path_to_model+"saved_model/")
 
 qg.translate(['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three',
              'album', 'deal', 'with', ',', 'which', 'left', '.'], attention_plot_folder=path_to_model)
@@ -172,7 +184,7 @@ qg.translate("the largest of these is the eldon square shop-ping centre , one of
 qg.translate(
     "the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" "), beam_width=3)
 qg.translate(['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
-                  'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'], beam_width=3)
+              'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.'], beam_width=3)
 
 dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
 chunks = [dev_sentences[x:x+100] for x in range(0, len(dev_sentences), 100)]
