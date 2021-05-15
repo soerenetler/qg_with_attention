@@ -74,7 +74,7 @@ class QuestionGenerator(tf.keras.Model):
 
             # Create AttentionWrapperState as initial_state for decoder
             decoder_initial_state = self.decoder.build_initial_state(
-                self.encoder.batch_sz, enc_hidden, tf.float32)
+                self.decoder.batch_sz, enc_hidden, tf.float32)
             pred = self.decoder(dec_input, decoder_initial_state, training=True)
 
             return pred
