@@ -4,7 +4,10 @@ class Encoder(tf.keras.layers.Layer):
     def __init__(self, vocab_size, embedding_dim, enc_units, batch_sz, embedding_matrix, bidirectional=False, **kwargs):
         super(Encoder, self).__init__(**kwargs)
         self.bidirectional = bidirectional
-        self.enc_units = enc_units
+        if self.bidirectional:
+            self.enc_units = enc_units/2
+        else:
+            self.enc_units = enc_units
         self.batch_sz = batch_sz
 
         self.embedding = tf.keras.layers.Embedding(vocab_size,

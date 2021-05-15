@@ -1,5 +1,6 @@
 import os
 import time
+from unicodedata import bidirectional
 
 import tensorflow as tf
 import shutil
@@ -20,9 +21,9 @@ parser.add_argument("-t", "--target_length", type=int, default=20,
                     help="max_length_targ")
 parser.add_argument("-i", "--input_length", type=int, default=80,
                     help="display a square of a given number")
-parser.add_argument("-x", "--vocab_input", type=int, default=None,#45000,
+parser.add_argument("-x", "--vocab_input", type=int, default=45000,
                     help="display a square of a given number")
-parser.add_argument("-y", "--max_vocab_targ", type=int, default=None, #28000,
+parser.add_argument("-y", "--max_vocab_targ", type=int, default=28000,
                     help="display a square of a given number")
 parser.add_argument("-e", "--epochs", type=int, default=1,
                     help="display a square of a given number")
@@ -118,7 +119,7 @@ tf.debugging.assert_shapes([(example_input_batch_val, (BATCH_SIZE, max_length_in
 tf.debugging.assert_shapes([(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
 encoder = Encoder(vocab_inp_size, embedding_dim, units, BATCH_SIZE,
-                  bidirectional=False, embedding_matrix=embedding_matrix)
+                  bidirectional=True, embedding_matrix=embedding_matrix)
 # sample input
 sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 sample_output, sample_hidden = encoder(
