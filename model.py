@@ -19,7 +19,7 @@ class QuestionGenerator(tf.keras.Model):
         inp, targ = data
 
         with tf.GradientTape() as tape:
-            pred = self((inp, targ), training=True)
+            pred = self((inp, targ), training=True, beam_width=1)
             print("TRAIN - targ", targ[0])
             real = targ[:, 1:]         # ignore <start> token
             print("Train - REAL", real[0])
