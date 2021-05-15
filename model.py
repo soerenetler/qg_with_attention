@@ -102,10 +102,13 @@ class QuestionGenerator(tf.keras.Model):
                 tf.debugging.assert_shapes([(enc_start_state,(inference_batch_size, self.encoder.enc_units))])
             enc_out, enc_hidden = self.encoder(
                 inp, enc_start_state, training=False)
-
-            tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
-                                        (enc_hidden, (inference_batch_size, self.encoder.enc_units))])
             
+            if self.encoder.bidirectional:
+                tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
+                                            (enc_hidden, (inference_batch_size, self.encoder.enc_units*2))])
+            else:
+                tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
+                                            (enc_hidden, (inference_batch_size, self.encoder.enc_units))])
             # use teacher forcing
             if beam_width == None:
                 dec_input = targ[:, :-1]  # Ignore <end> token
