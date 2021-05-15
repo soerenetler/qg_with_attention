@@ -211,7 +211,7 @@ class QuestionGenerator(tf.keras.Model):
         if beam_width ==1:
             outputs = self((inputs, None), training=False, beam_width=beam_width).sample_id.numpy()
         if beam_width > 1:
-            outputs = self((inputs, None), training=False, beam_width=beam_width).predicted_ids.numpy()
+            outputs = self((inputs, None), training=False, beam_width=beam_width)
             final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
             beam_scores = tf.transpose(
                 outputs.beam_search_decoder_output.scores, perm=(0, 2, 1))
