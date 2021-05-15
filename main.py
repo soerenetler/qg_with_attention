@@ -45,11 +45,18 @@ path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" 
 path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + \
     args.dataset + "/" + modelname + "/"
 
-shutil.rmtree(path_to_model)
+try:
+    shutil.rmtree(path_to_model)
+except FileNotFoundError:
+    print("Directory does not excist: {}".format(path_to_model))
 
 path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + args.dataset + "/"+ modelname + "/"
 
-shutil.rmtree(path_to_logs)
+try:
+    shutil.rmtree(path_to_logs)
+except FileNotFoundError:
+    print("Directory does not excist: {}".format(path_to_logs))
+
 
 path_to_glove_file = "/content/gdrive/MyDrive/mt-qg-data/glove.840B.300d.txt"
 max_length_targ = args.target_length
