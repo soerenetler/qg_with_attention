@@ -36,16 +36,10 @@ class Encoder(tf.keras.layers.Layer):
             self.gru = tf.keras.layers.Bidirectional(self.gru)
 
 
-    def call(self, x, hidden, training=False):
+    def call(self, x, training=False):
         x = self.embedding(x)
         result = self.gru(
-            x, training=training)#, initial_state=hidden)
+            x, training=training)
         output = result[0]
         state = tf.concat(result[1:], 1)
         return output, state
-
-    def initialize_hidden_state(self, batch_sz):
-        if self.bidirectional:
-            return [tf.zeros((batch_sz, self.enc_units)) for i in range(2)]
-        else:
-            return tf.zeros((batch_sz, self.enc_units))

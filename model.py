@@ -64,13 +64,11 @@ class QuestionGenerator(tf.keras.Model):
     def call(self, qg_inputs, training=False, beam_width=None):
         if training == True:
             inp, targ = qg_inputs
-            batch_sz = inp.shape[0]
 
             dec_input = targ[:, :-1]  # Ignore <end> token
 
-            enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
             enc_output, enc_hidden = self.encoder(
-                inp, enc_hidden, training=training)
+                inp, training=training)
             # Set the AttentionMechanism object with encoder_outputs
             self.decoder.attention_mechanism.setup_memory(enc_output)
 
@@ -94,14 +92,8 @@ class QuestionGenerator(tf.keras.Model):
             inference_batch_size = inp.shape[0]
             length_inp = inp.shape[1]
 
-            enc_start_state = self.encoder.initialize_hidden_state(
-                inference_batch_size)
-            if self.encoder.bidirectional:
-                tf.debugging.assert_shapes([(enc_start_state,(2, inference_batch_size, self.encoder.enc_units))])
-            else:
-                tf.debugging.assert_shapes([(enc_start_state,(inference_batch_size, self.encoder.enc_units))])
             enc_out, enc_hidden = self.encoder(
-                inp, enc_start_state, training=False)
+                inp, training=False)
             
             if self.encoder.bidirectional:
                 tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
