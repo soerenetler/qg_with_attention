@@ -45,7 +45,7 @@ class QuestionGenerator(tf.keras.Model):
         # Unpack the data
         inp, targ = data
         # Compute predictions
-        pred = self((inp, targ), training=False, beam_width=-1)
+        pred = self((inp, targ), training=False, beam_width=3)
         print("TEST - targ", targ[0])
         real = targ[:, 1:]
 
