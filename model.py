@@ -45,7 +45,7 @@ class QuestionGenerator(tf.keras.Model):
         # Unpack the data
         inp, targ = data
         # Compute predictions
-        pred = self((inp, targ), training=False, beam_width=3)
+        pred = self((inp, targ), training=False, beam_width=None)
         print("TEST - targ", targ[0])
         real = targ[:, 1:]
 
@@ -105,7 +105,15 @@ class QuestionGenerator(tf.keras.Model):
             
             # use teacher forcing
             if beam_width == None:
-                raise NotImplementedError("Teacher forcing in evaluation mode not implemented")
+                # Set the AttentionMechanism object with encoder_outputs
+                self.decoder.attention_mechanism.setup_memory(enc_out)
+
+                # Create AttentionWrapperState as initial_state for decoder
+                decoder_initial_state = self.decoder.build_initial_state(
+                    self.encoder.batch_sz, enc_hidden, tf.float32)
+                pred = self.decoder(enc_hidden, decoder_initial_state, training=True)
+
+                return pred
 
             #use GreedyEmbeddingSampler
             elif beam_width == 1:
