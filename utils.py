@@ -45,18 +45,18 @@ loss_object = tf.keras.losses.SparseCategoricalCrossentropy(
 
 
 def loss_function(real, pred):
-    print("loss - real.shape", real.shape)
-    print(real)
-    print("loss - pred.shape", pred.shape)
-    print(pred)
+    #print("loss - real.shape", real.shape)
+    #print(real)
+    #print("loss - pred.shape", pred.shape)
+    #print(pred)
     mask = tf.math.logical_not(tf.math.equal(real, 0))
-    print("loss - mask.shape", mask.shape)
+    #print("loss - mask.shape", mask.shape)
     loss_ = loss_object(real, pred)
-    print("loss - loss_.shape", loss_.shape)
+    #print("loss - loss_.shape", loss_.shape)
     mask = tf.cast(mask, loss_.dtype)
     loss_ *= mask
 
-    print("loss - loss_.shape", loss_.shape)
+    #print("loss - loss_.shape", loss_.shape)
 
     return tf.reduce_mean(loss_)
 
