@@ -80,24 +80,26 @@ class QuestionGenerator(tf.keras.Model):
             return pred
 
         elif training == False:
-            #print("qg_inputs:", qg_inputs)
+            tf.print("qg_inputs:", qg_inputs)
             if type(qg_inputs) == tf.Tensor:
                 inp = qg_inputs
             elif len(qg_inputs) == 2:
                 inp, targ = qg_inputs
+                tf.print("targ: ", targ)
             else:
                 raise NotImplementedError(
                     "Input has a length of {}.".format(len(qg_inputs)))
             tf.print("INPUT: ", inp)
-            print("INPUT: ", inp)
-            if self.decoder.layer ==1:
-                inference_batch_size = inp.shape[0]
-                length_inp = inp.shape[1]
-            elif self.decoder.layer > 1:
-                tf.print("INPUT[0].shape: ", inp[0].shape)
-                print("INPUT[0].shape: ", inp[0].shape)
-                inference_batch_size = inp[0].shape[0]
-                length_inp = inp[0].shape[1]
+            tf.print("INPUT: ", inp)
+
+            #if self.decoder.layer ==1:
+            inference_batch_size = inp.shape[0]
+            length_inp = inp.shape[1]
+            #elif self.decoder.layer > 1:
+            #    tf.print("INPUT[0].shape: ", inp[0].shape)
+            #    print("INPUT[0].shape: ", inp[0].shape)
+            #    inference_batch_size = inp[0].shape[0]
+            #    length_inp = inp[0].shape[1]
 
             enc_out, enc_hidden = self.encoder(
                 inp, training=False)
