@@ -57,9 +57,6 @@ except FileNotFoundError:
 path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + \
     args.dataset + "/" + modelname + "/"
 
-
-tf.debugging.experimental.enable_dump_debug_info(path_to_logs, tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1)
-
 try:
     shutil.rmtree(path_to_logs)
 except FileNotFoundError:
