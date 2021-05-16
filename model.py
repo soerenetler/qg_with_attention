@@ -89,10 +89,12 @@ class QuestionGenerator(tf.keras.Model):
                 raise NotImplementedError(
                     "Input has a length of {}.".format(len(qg_inputs)))
             tf.print("INPUT: ", inp)
+            print("INPUT: ", inp)
             if self.decoder.layer ==1:
                 inference_batch_size = inp.shape[0]
                 length_inp = inp.shape[1]
-            elif self.decoder.layer >1:
+            elif self.decoder.layer > 1:
+                tf.print("INPUT: ", inp)
                 inference_batch_size = inp[0].shape[0]
                 length_inp = inp[0].shape[1]
 
@@ -104,7 +106,7 @@ class QuestionGenerator(tf.keras.Model):
                     tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
                                                 (enc_hidden, (inference_batch_size, self.encoder.enc_units*2))])
                 if self.decoder.layer>1:
-                  tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
+                    tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
                                             (enc_hidden, (self.decoder.layer, inference_batch_size, self.encoder.enc_units*2))])  
             else:
                 if self.decoder.layer==1:
@@ -122,7 +124,7 @@ class QuestionGenerator(tf.keras.Model):
 
                 # Create AttentionWrapperState as initial_state for decoder
                 decoder_initial_state = self.decoder.build_initial_state(
-                    self.decoder.batch_sz, enc_hidden, tf.float32)
+                    inference_batch_size, enc_hidden, tf.float32)
                 pred = self.decoder(dec_input, decoder_initial_state, training=True)
 
                 return pred
