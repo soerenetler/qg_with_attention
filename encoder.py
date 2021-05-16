@@ -23,7 +23,7 @@ class Encoder(tf.keras.layers.Layer):
                                         return_state=True,
                                         dropout=0.3)
         elif self.layer >1:
-            rnn_cells = [tf.keras.layers.GRUCell(self.enc_units, dropout=0.3) for _ in range(2)]
+            rnn_cells = [tf.keras.layers.GRUCell(self.enc_units, dropout=0.3) for _ in range(self.layer)]
             stacked_gru = tf.keras.layers.StackedRNNCells(rnn_cells)
             self.gru = tf.keras.layers.RNN(stacked_gru, return_sequences=True,
                                         return_state=True)
