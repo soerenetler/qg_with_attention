@@ -73,8 +73,8 @@ class Decoder(tf.keras.layers.Layer):
             cell_state=encoder_state)
         return decoder_initial_state
 
-    def call(self, x, hidden, training=False):
-        if training == True:
+    def call(self, x, hidden, training=False, beam_width=None):
+        if training == True or beam_width==None:
             print("initial_state: ", hidden)
             print("dec_input: ", x)
             x = self.embedding(x)
