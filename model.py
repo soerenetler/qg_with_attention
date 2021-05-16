@@ -88,7 +88,7 @@ class QuestionGenerator(tf.keras.Model):
             else:
                 raise NotImplementedError(
                     "Input has a length of {}.".format(len(qg_inputs)))
-
+            tf.print("INPUT: ", inp)
             if self.decoder.layer ==1:
                 inference_batch_size = inp.shape[0]
                 length_inp = inp.shape[1]
