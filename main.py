@@ -48,6 +48,7 @@ path_to_folder = "/content/gdrive/MyDrive/mt-qg-data/01_data/preprocessedData/" 
 path_to_model = "/content/gdrive/MyDrive/mt-qg-data/00_models/qg_attention/" + \
     args.dataset + "/" + modelname + "/"
 
+
 try:
     shutil.rmtree(path_to_model)
 except FileNotFoundError:
@@ -55,6 +56,9 @@ except FileNotFoundError:
 
 path_to_logs = "/content/gdrive/MyDrive/mt-qg-data/02_logs/qg_attention/" + \
     args.dataset + "/" + modelname + "/"
+
+
+tf.debugging.experimental.enable_dump_debug_info(path_to_logs, tensor_debug_mode="FULL_HEALTH", circular_buffer_size=-1)
 
 try:
     shutil.rmtree(path_to_logs)

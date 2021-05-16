@@ -94,7 +94,8 @@ class QuestionGenerator(tf.keras.Model):
                 inference_batch_size = inp.shape[0]
                 length_inp = inp.shape[1]
             elif self.decoder.layer > 1:
-                tf.print("INPUT: ", inp)
+                tf.print("INPUT[0].shape: ", inp[0].shape)
+                print("INPUT[0].shape: ", inp[0].shape)
                 inference_batch_size = inp[0].shape[0]
                 length_inp = inp[0].shape[1]
 
