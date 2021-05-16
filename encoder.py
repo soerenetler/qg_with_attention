@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class Encoder(tf.keras.layers.Layer):
-    def __init__(self, vocab_size, embedding_dim, enc_units, embedding_matrix, bidirectional=False, layer=1, **kwargs):
+    def __init__(self, vocab_size, embedding_dim, enc_units, embedding_matrix, bidirectional=False, layer=1, dropout=0.4, **kwargs):
         super(Encoder, self).__init__(**kwargs)
         self.bidirectional = bidirectional
         self.layer = layer
@@ -21,9 +21,9 @@ class Encoder(tf.keras.layers.Layer):
             self.gru = tf.keras.layers.GRU(self.enc_units,
                                         return_sequences=True,
                                         return_state=True,
-                                        dropout=0.3)
+                                        dropout=dropout)
         elif self.layer >1:
-            rnn_cells = [tf.keras.layers.GRUCell(self.enc_units, dropout=0.3) for _ in range(self.layer)]
+            rnn_cells = [tf.keras.layers.GRUCell(self.enc_units, dropout=dropout) for _ in range(self.layer)]
             stacked_gru = tf.keras.layers.StackedRNNCells(rnn_cells)
             self.gru = tf.keras.layers.RNN(stacked_gru, return_sequences=True,
                                         return_state=True)
