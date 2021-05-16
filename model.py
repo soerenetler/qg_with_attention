@@ -62,7 +62,7 @@ class QuestionGenerator(tf.keras.Model):
         return {m.name: m.result() for m in self.metrics}
 
     def call(self, qg_inputs, training=False, beam_width=None):
-        if training == True:
+        if training == True or beam_width == None:
             inp, targ = qg_inputs
 
             dec_input = targ[:, :-1]  # Ignore <end> token
@@ -75,7 +75,7 @@ class QuestionGenerator(tf.keras.Model):
             # Create AttentionWrapperState as initial_state for decoder
             decoder_initial_state = self.decoder.build_initial_state(
                 self.decoder.batch_sz, enc_hidden, tf.float32)
-            pred = self.decoder(dec_input, decoder_initial_state, training=True)
+            pred = self.decoder(dec_input, decoder_initial_state, training=training)
 
             return pred
 
@@ -116,22 +116,9 @@ class QuestionGenerator(tf.keras.Model):
                 if self.decoder.layer>1:
                     tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
                                                 (enc_hidden, (self.decoder.layer, inference_batch_size, self.encoder.enc_units))])
-            # use teacher forcing
-            if beam_width == None:
-                dec_input = targ[:, :-1]  # Ignore <end> token
-
-                # Set the AttentionMechanism object with encoder_outputs
-                self.decoder.attention_mechanism.setup_memory(enc_out)
-
-                # Create AttentionWrapperState as initial_state for decoder
-                decoder_initial_state = self.decoder.build_initial_state(
-                    inference_batch_size, enc_hidden, tf.float32)
-                pred = self.decoder(dec_input, decoder_initial_state, training=True)
-
-                return pred
 
             #use GreedyEmbeddingSampler
-            elif beam_width == 1:
+            if beam_width == 1:
                 # Setup Memory in decoder stack
                 self.decoder.attention_mechanism.setup_memory(enc_out)
                 # set decoder_initial_state
