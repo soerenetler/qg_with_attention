@@ -124,7 +124,7 @@ class QuestionGenerator(tf.keras.Model):
                 # Setup Memory in decoder stack
                 self.decoder.attention_mechanism.setup_memory(enc_out)
                 # set decoder_initial_state
-                pred = self.decoder(None, enc_hidden, training=False)
+                pred = self.decoder(None, enc_hidden, training=False, beam_width=1)
                 return pred
 
             #use BeamSearch
