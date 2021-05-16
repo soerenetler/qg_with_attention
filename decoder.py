@@ -82,9 +82,9 @@ class Decoder(tf.keras.layers.Layer):
                 x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
             return outputs
         elif training == False:
-            if self.decoder.layer ==1:
+            if self.layer ==1:
               inference_batch_size = hidden.shape[0]
-            elif self.decoder.layer > 1:
+            elif self.layer > 1:
               inference_batch_size = hidden[0].shape[0]
             decoder_initial_state = self.build_initial_state(
                 inference_batch_size, hidden, tf.float32)
