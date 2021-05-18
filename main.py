@@ -143,7 +143,7 @@ tf.debugging.assert_shapes(
     [(sample_output, (BATCH_SIZE, max_length_inp, units))])
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
-                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix, layer=layer)
+                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix, layer=layer, dropout=dropout)
 sample_x = tf.random.uniform(
     (BATCH_SIZE, max_length_targ), dtype=tf.dtypes.float32)
 decoder.attention_mechanism.setup_memory(sample_output)

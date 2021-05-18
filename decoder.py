@@ -3,7 +3,7 @@ import tensorflow_addons as tfa
 
 
 class Decoder(tf.keras.layers.Layer):
-    def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, layer=1, attention_type='luong', max_length_inp=80, max_length_targ=20, embedding_matrix=None, **kwargs):
+    def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, layer=1, attention_type='luong', max_length_inp=80, max_length_targ=20, embedding_matrix=None,dropout=0.3, **kwargs):
         super(Decoder, self).__init__(**kwargs)
         self.batch_sz = batch_sz
         self.dec_units = dec_units
@@ -23,10 +23,11 @@ class Decoder(tf.keras.layers.Layer):
         # Define the fundamental cell for decoder recurrent structure
         if self.layer == 1:
             self.gru = tf.keras.layers.GRUCell(self.dec_units,
-                                               recurrent_initializer='glorot_uniform')
+                                               recurrent_initializer='glorot_uniform',
+                                               dropout=dropout)
         elif self.layer > 1:
             rnn_cells = [tf.keras.layers.GRUCell(
-                self.dec_units) for _ in range(self.layer)]
+                self.dec_units, dropout=dropout) for _ in range(self.layer)]
             self.gru = tf.keras.layers.StackedRNNCells(rnn_cells)
         else:
             raise NotImplementedError(
