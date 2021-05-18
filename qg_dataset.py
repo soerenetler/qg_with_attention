@@ -21,7 +21,7 @@ class QGDataset:
   def preprocess_sentence(self, w):
     w_result = ['<start>']
     for t in w:
-      t = self.unicode_to_ascii(t.lower().strip())
+      t = self.unicode_to_ascii(t.strip()) #.lower()
 
       # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
       #t = re.sub(r"[^a-zA-Z\d?.!,¿]+", " ", t)
