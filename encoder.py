@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 class Encoder(tf.keras.layers.Layer):
-    def __init__(self, vocab_size, embedding_dim, enc_units, embedding_matrix, bidirectional=False, layer=1, dropout=0.4, **kwargs):
+    def __init__(self, vocab_size, embedding_dim, enc_units, embedding_matrix=None, pretraine_embeddings=False, bidirectional=False, layer=1, dropout=0.4, **kwargs):
         super(Encoder, self).__init__(**kwargs)
         self.bidirectional = bidirectional
         self.layer = layer
@@ -11,11 +11,16 @@ class Encoder(tf.keras.layers.Layer):
         else:
             self.enc_units = enc_units
 
-        self.embedding = tf.keras.layers.Embedding(vocab_size,
-                                                   embedding_dim,
-                                                   embeddings_initializer=tf.keras.initializers.Constant(
-                                                       embedding_matrix),
-                                                   trainable=False)
+        if pretraine_embeddings:
+            self.embedding = tf.keras.layers.Embedding(vocab_size,
+                                                    embedding_dim,
+                                                    embeddings_initializer=tf.keras.initializers.Constant(
+                                                        embedding_matrix),
+                                                    trainable=False)
+        else:
+            self.embedding = tf.keras.layers.Embedding(vocab_size,
+                                                    embedding_dim,
+                                                    trainable=True)
 
         if self.layer == 1:
             self.gru = tf.keras.layers.GRU(self.enc_units,

@@ -36,6 +36,8 @@ parser.add_argument("-l", "--layer", type=int, default=1,
                     help="display a square of a given number")
 parser.add_argument("-o", "--dropout", type=float, default=0.4,
                     help="display a square of a given number")
+parser.add_argument("-p", "--pretrained", type=bool, default=False,
+                    help="display a square of a given number")
 args = parser.parse_args()
 
 print(args)
@@ -75,6 +77,7 @@ EPOCHS = args.epochs
 BATCH_SIZE = args.batch
 units = args.units
 dropout = args.dropout
+pretrained = args.pretrained
 
 
 # SAMPLES
@@ -135,7 +138,7 @@ tf.debugging.assert_shapes(
     [(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
 encoder = Encoder(vocab_inp_size, embedding_dim, units,
-                  bidirectional=True, embedding_matrix=inp_embedding_matrix, layer=layer, dropout=dropout)
+                  bidirectional=True, embedding_matrix=inp_embedding_matrix,pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
 #sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 # sample input
 sample_output, sample_hidden = encoder(
@@ -149,7 +152,7 @@ else:
     tf.debugging.assert_shapes([(sample_hidden, (layer, BATCH_SIZE, units))])
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
-                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix, layer=layer, dropout=dropout)
+                  targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix, pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
 sample_x = tf.random.uniform(
     (BATCH_SIZE, max_length_targ), dtype=tf.dtypes.float32)
 decoder.attention_mechanism.setup_memory(sample_output)
