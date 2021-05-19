@@ -143,7 +143,10 @@ sample_output, sample_hidden = encoder(
 tf.debugging.assert_shapes(
     [(sample_output, (BATCH_SIZE, max_length_inp, units))])
 print("sample_hidden: ", sample_hidden)
-tf.debugging.assert_shapes([(sample_hidden, (BATCH_SIZE, units))])
+if layer == 1:
+    tf.debugging.assert_shapes([(sample_hidden, (BATCH_SIZE, units))])
+else:
+    tf.debugging.assert_shapes([(sample_hidden, (layer, BATCH_SIZE, units))])
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
                   targ_tokenizer.word_index['<start>'], targ_tokenizer.word_index['<end>'],  attention_type='luong', max_length_inp=max_length_inp, max_length_targ=max_length_targ, embedding_matrix=targ_embedding_matrix, layer=layer, dropout=dropout)
