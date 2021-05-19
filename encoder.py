@@ -40,7 +40,9 @@ class Encoder(tf.keras.layers.Layer):
         result = self.gru(
             x, training=training, initial_state=hidden)
         output = result[0]
+        print("Encoder result:", result[1:])
         state = tuple([tf.concat(result[i:i+2], 1) for i in range(1, len(result[1:]) - 1)])
+        print("Encoder state:", state)
         return output, state
 
     def initialize_hidden_state(self, batch_sz):
