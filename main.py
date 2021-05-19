@@ -164,6 +164,7 @@ optimizer = tf.keras.optimizers.Adam()
 
 checkpoint_dir = path_to_model + 'training_checkpoints'
 
+early_stopping = tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3)
 tensorboard_callback = tf.keras.callbacks.TensorBoard(
     log_dir=path_to_logs, histogram_freq=1)
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir + "/model_{epoch}",
@@ -178,7 +179,7 @@ qg.compile(optimizer=optimizer, loss=loss_function)
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 # qg.summary()
 qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[
-       checkpoint_callback, tensorboard_callback], validation_data=dataset_val)
+       checkpoint_callback, tensorboard_callback, early_stopping], validation_data=dataset_val)
 
 # qg.save(path_to_model+"saved_model/")
 
