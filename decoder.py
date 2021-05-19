@@ -23,11 +23,10 @@ class Decoder(tf.keras.layers.Layer):
         # Define the fundamental cell for decoder recurrent structure
         if self.layer == 1:
             self.gru = tf.keras.layers.GRUCell(self.dec_units,
-                                               recurrent_initializer='glorot_uniform',
-                                               dropout=dropout)
+                                               recurrent_initializer='glorot_uniform')
         elif self.layer > 1:
             rnn_cells = [tf.keras.layers.GRUCell(
-                self.dec_units, dropout=dropout) for _ in range(self.layer)]
+                self.dec_units) for _ in range(self.layer)]
             self.gru = tf.keras.layers.StackedRNNCells(rnn_cells)
         else:
             raise NotImplementedError(
