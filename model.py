@@ -135,9 +135,9 @@ class QuestionGenerator(tf.keras.Model):
             elif beam_width > 1:
                 start_tokens = tf.fill([inference_batch_size],
                                self.targ_tokenizer.word_index['<start>'])
-                #print("start_tokens.shape: ", start_tokens.shape)
+                print("start_tokens.shape: ", start_tokens.shape)
                 end_token = self.targ_tokenizer.word_index['<end>']
-                #print("end_token: ", end_token)
+                print("end_token: ", end_token)
 
                 # From official documentation
                 # NOTE If you are using the BeamSearchDecoder with a cell wrapped in AttentionWrapper, then you must ensure that:
@@ -147,8 +147,8 @@ class QuestionGenerator(tf.keras.Model):
 
                 enc_out = tfa.seq2seq.tile_batch(enc_out, multiplier=beam_width)
                 self.decoder.attention_mechanism.setup_memory(enc_out)
-                #print(
-                #    "beam_with * [batch_size, max_length_input, rnn_units] :]] :", enc_out.shape)
+                print(
+                    "beam_with * [batch_size, max_length_input, rnn_units] :]] :", enc_out.shape)
 
                 # set decoder_inital_state which is an AttentionWrapperState considering beam_width
                 hidden_state = tfa.seq2seq.tile_batch(
@@ -157,14 +157,14 @@ class QuestionGenerator(tf.keras.Model):
                     batch_size=beam_width*inference_batch_size, dtype=tf.float32)
                 decoder_initial_state = decoder_initial_state.clone(
                     cell_state=hidden_state)
-                #print("decoder_initial_state.cell_state: ",
-                #    decoder_initial_state.cell_state.shape)
-                #print("decoder_initial_state.attention: ",
-                #    decoder_initial_state.attention.shape)
-                #print("decoder_initial_state.alignments: ",
-                #    decoder_initial_state.alignments.shape)
-                #print("decoder_initial_state.attention_state: ",
-                #    decoder_initial_state.attention_state.shape)
+                print("decoder_initial_state.cell_state: ",
+                    decoder_initial_state.cell_state.shape)
+                print("decoder_initial_state.attention: ",
+                    decoder_initial_state.attention.shape)
+                print("decoder_initial_state.alignments: ",
+                    decoder_initial_state.alignments.shape)
+                print("decoder_initial_state.attention_state: ",
+                    decoder_initial_state.attention_state.shape)
 
                 # Instantiate BeamSearchDecoder
                 decoder_instance = tfa.seq2seq.BeamSearchDecoder(
