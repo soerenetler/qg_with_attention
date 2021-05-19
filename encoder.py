@@ -35,7 +35,7 @@ class Encoder(tf.keras.layers.Layer):
             self.gru = tf.keras.layers.Bidirectional(self.gru)
 
 
-    def call(self, x, hidden, training=False):
+    def call(self, x, training=False):
         x = self.embedding(x)
         result = self.gru(
             x, training=training)#, initial_state=hidden)

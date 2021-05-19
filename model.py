@@ -64,12 +64,12 @@ class QuestionGenerator(tf.keras.Model):
     def call(self, qg_inputs, training=False, beam_width=None):
         if training == True or beam_width == None:
             inp, targ = qg_inputs
-            batch_sz = inp.shape[0]
+            # batch_sz = inp.shape[0]
             dec_input = targ[:, :-1]  # Ignore <end> token
             
             #enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
             enc_output, enc_hidden = self.encoder(
-                inp, None, training=training)
+                inp, training=training)
             # Set the AttentionMechanism object with encoder_outputs
             self.decoder.attention_mechanism.setup_memory(enc_output)
 
@@ -90,13 +90,13 @@ class QuestionGenerator(tf.keras.Model):
             else:
                 raise NotImplementedError(
                     "Input has a length of {}.".format(len(qg_inputs)))
-            tf.print("INPUT: ", inp)
-            tf.print("INPUT: ", inp)
+            # tf.print("INPUT: ", inp)
+            # tf.print("INPUT: ", inp)
 
             #if self.decoder.layer ==1:
             inference_batch_size = inp.shape[0]
             length_inp = inp.shape[1]
-            print("model - inference_batch_size:",inference_batch_size)
+            # print("model - inference_batch_size:",inference_batch_size)
             #elif self.decoder.layer > 1:
             #    tf.print("INPUT[0].shape: ", inp[0].shape)
             #    print("INPUT[0].shape: ", inp[0].shape)
@@ -128,8 +128,8 @@ class QuestionGenerator(tf.keras.Model):
                 # Setup Memory in decoder stack
                 self.decoder.attention_mechanism.setup_memory(enc_out)
                 # set decoder_initial_state
-                pred = self.decoder(None, enc_hidden, training=False, beam_width=1)
-                return pred
+                pred, attention_matrix = self.decoder(None, enc_hidden, training=False, beam_width=1)
+                return pred, attention_matrix
 
             #use BeamSearch
             elif beam_width > 1:
@@ -216,7 +216,10 @@ class QuestionGenerator(tf.keras.Model):
         inputs = tf.convert_to_tensor(inputs)
 
         if beam_width ==1:
-            outputs = self((inputs, None), training=False, beam_width=beam_width).sample_id.numpy()
+            outputs, attention_matrix = self((inputs, None), training=False, beam_width=beam_width).sample_id.numpy()
+            result_str = self.targ_tokenizer.sequences_to_texts(outputs)
+            for i in range(len(proc_sentences)):
+                plot_attention(attention_matrix[:,i,:], proc_sentences[i], result_str[i].split(" "), folder=attention_plot_folder)
         if beam_width > 1:
             outputs = self((inputs, None), training=False, beam_width=beam_width)
             final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
@@ -226,13 +229,8 @@ class QuestionGenerator(tf.keras.Model):
             #print("final_outputs.shape = (inference_batch_size, beam_width, time_step_outputs) ",
             #    final_outputs.shape)
             outputs = final_outputs[:,0,:].numpy()
+            result_str = self.targ_tokenizer.sequences_to_texts(outputs)
 
-
-        #print(outputs)
-        result_str = self.targ_tokenizer.sequences_to_texts(outputs)
-        #attention_matrix = final_state.alignment_history.stack()
-
-        #plot_attention(attention_matrix[:,0,:], proc_sentence, result_str[0].split(" "), folder=attention_plot_folder)
         print('Input: %s' % (sentences[0]))
         print('Predicted: {}'.format(result_str[0]))
         return result_str

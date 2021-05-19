@@ -75,8 +75,8 @@ class Decoder(tf.keras.layers.Layer):
 
     def call(self, x, hidden, training=False, beam_width=None):
         if training == True or beam_width==None:
-            print("initial_state: ", hidden)
-            print("dec_input: ", x)
+            # print("initial_state: ", hidden)
+            # print("dec_input: ", x)
             x = self.embedding(x)
             outputs, _, _ = self.train_decoder(
                 x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
@@ -86,24 +86,24 @@ class Decoder(tf.keras.layers.Layer):
               inference_batch_size = hidden.shape[0]
             elif self.layer > 1:
               inference_batch_size = hidden[0].shape[0]
-            print("Decoder - inference_batch_size:",inference_batch_size)
+            # print("Decoder - inference_batch_size:",inference_batch_size)
             decoder_initial_state = self.build_initial_state(
                 inference_batch_size, hidden, tf.float32)
             start_tokens = tf.fill(
                 [inference_batch_size], self.start_token)
             decoder_embedding_matrix = self.embedding.variables[0]
-            print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
+            # print("decoder_embedding_matrix: ", decoder_embedding_matrix.shape)
 
-            outputs, final_state, sequence_lengths = self.inference_decoder(
+            outputs, final_state, _ = self.inference_decoder(
                 decoder_embedding_matrix, start_tokens=start_tokens, end_token=self.end_token, initial_state=decoder_initial_state)
-            print("sequence_lengths", sequence_lengths)
-            print("final_state, ", final_state)
-            print("final_state.alignment_history, ",
-                  final_state.alignment_history)
-            print("final_state.alignment_history.stack(), ",
-                  final_state.alignment_history.stack())
-            print("EVALUATION - Outputs", outputs.sample_id.shape)
-            return outputs
+            # print("sequence_lengths", sequence_lengths)
+            # print("final_state, ", final_state)
+            # print("final_state.alignment_history, ",
+            #      final_state.alignment_history)
+            # print("final_state.alignment_history.stack(), ",
+            #       final_state.alignment_history.stack())
+            # print("EVALUATION - Outputs", outputs.sample_id.shape)
+            return outputs, final_state.alignment_history.stack()
         else:
             raise NotImplementedError(
                 "Call is currently not implemented with training set to {}".format(training))

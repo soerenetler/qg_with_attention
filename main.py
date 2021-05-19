@@ -139,7 +139,7 @@ encoder = Encoder(vocab_inp_size, embedding_dim, units,
 #sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 # sample input
 sample_output, sample_hidden = encoder(
-    example_input_batch,None, training=True)
+    example_input_batch, training=True)
 tf.debugging.assert_shapes(
     [(sample_output, (BATCH_SIZE, max_length_inp, units))])
 print("sample_hidden: ", sample_hidden)
