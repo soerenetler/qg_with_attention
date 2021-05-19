@@ -67,9 +67,9 @@ class QuestionGenerator(tf.keras.Model):
             batch_sz = inp.shape[0]
             dec_input = targ[:, :-1]  # Ignore <end> token
             
-            enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
+            #enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
             enc_output, enc_hidden = self.encoder(
-                inp, enc_hidden, training=training)
+                inp, None, training=training)
             # Set the AttentionMechanism object with encoder_outputs
             self.decoder.attention_mechanism.setup_memory(enc_output)
 
