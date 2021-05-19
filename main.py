@@ -187,9 +187,9 @@ qg.translate(["the largest of these is the eldon square shop-ping centre , one o
              attention_plot_folder=path_to_model)
 
 qg.translate(
-    ["the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" ")]*64, beam_width=3)
+    ["the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" ")], beam_width=3)
 qg.translate([['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
-              'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.']]*64, beam_width=3)
+              'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.']], beam_width=3)
 
 dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
 chunks = [dev_sentences[x:x+64] for x in range(0, len(dev_sentences), 64)]
