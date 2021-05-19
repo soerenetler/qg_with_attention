@@ -157,14 +157,14 @@ class QuestionGenerator(tf.keras.Model):
                     batch_size=beam_width*inference_batch_size, dtype=tf.float32)
                 decoder_initial_state = decoder_initial_state.clone(
                     cell_state=hidden_state)
-                print("decoder_initial_state.cell_state: ",
-                    decoder_initial_state.cell_state.shape)
-                print("decoder_initial_state.attention: ",
-                    decoder_initial_state.attention.shape)
-                print("decoder_initial_state.alignments: ",
-                    decoder_initial_state.alignments.shape)
-                print("decoder_initial_state.attention_state: ",
-                    decoder_initial_state.attention_state.shape)
+                #print("decoder_initial_state.cell_state: ",
+                #    decoder_initial_state.cell_state.shape)
+                #print("decoder_initial_state.attention: ",
+                #    decoder_initial_state.attention.shape)
+                #print("decoder_initial_state.alignments: ",
+                #    decoder_initial_state.alignments.shape)
+                #print("decoder_initial_state.attention_state: ",
+                #    decoder_initial_state.attention_state.shape)
 
                 # Instantiate BeamSearchDecoder
                 decoder_instance = tfa.seq2seq.BeamSearchDecoder(
