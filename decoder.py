@@ -87,6 +87,7 @@ class Decoder(tf.keras.layers.Layer):
               inference_batch_size = hidden.shape[0]
             elif self.layer > 1:
               inference_batch_size = hidden[0].shape[0]
+            print("Decoder - inference_batch_size:",inference_batch_size)
             decoder_initial_state = self.build_initial_state(
                 inference_batch_size, hidden, tf.float32)
             start_tokens = tf.fill(
