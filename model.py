@@ -103,10 +103,10 @@ class QuestionGenerator(tf.keras.Model):
             #    inference_batch_size = inp[0].shape[0]
             #    length_inp = inp[0].shape[1]
 
-            enc_hidden = self.encoder.initialize_hidden_state(inference_batch_size)
+            #enc_hidden = self.encoder.initialize_hidden_state(inference_batch_size)
 
             enc_out, enc_hidden = self.encoder(
-                inp, enc_hidden, training=False)
+                inp, None, training=False)
             
             if self.encoder.bidirectional:
                 if self.decoder.layer==1:
