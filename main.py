@@ -142,6 +142,7 @@ sample_output, sample_hidden = encoder(
     example_input_batch,sample_hidden, training=True)
 tf.debugging.assert_shapes(
     [(sample_output, (BATCH_SIZE, max_length_inp, units))])
+print("sample_hidden: ", sample_hidden)
 tf.debugging.assert_shapes([(sample_hidden, (BATCH_SIZE, units))])
 
 decoder = Decoder(vocab_tar_size, embedding_dim, units, BATCH_SIZE,
