@@ -41,9 +41,12 @@ class Encoder(tf.keras.layers.Layer):
             x, training=training, initial_state=hidden)
         output = result[0]
         print("Encoder result:", result[1:])
-        state = tuple([tf.concat(result[i:i+2], 1) for i in range(1, len(result[1:]))])
-        print("Encoder state:", state)
-        return output, state
+        states = tuple([tf.concat(result[i:i+2], 1) for i in range(1, len(result[1:]))])
+        print("Encoder state:", states)
+        if len(states) == 1:
+            return output, states[0]
+        else:
+            return output, states
 
     def initialize_hidden_state(self, batch_sz):
         if self.bidirectional:
