@@ -193,6 +193,7 @@ qg.translate([["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capi
              "the", "German", "state", "of", "Brandenburg", "."]]*64, attention_plot_folder=path_to_model)
 qg.translate(["the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" ")]*64,
              attention_plot_folder=path_to_model)
+qg.translate(["The name of the person is John .".split(" ")], attention_plot_folder=path_to_model)
 
 qg.translate(
     ["the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" ")], beam_width=3)
