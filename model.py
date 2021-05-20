@@ -209,10 +209,10 @@ class QuestionGenerator(tf.keras.Model):
     def translate(self, sentences, beam_width=1, attention_plot_folder=""):
         proc_sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
 
-        inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
-        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs)
+        token_inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
+        pad_inputs = tf.keras.preprocessing.sequence.pad_sequences(token_inputs)
                                                              # maxlen=self.max_length_inp,)
-        inputs = tf.convert_to_tensor(inputs)
+        inputs = tf.convert_to_tensor(pad_inputs)
 
         if beam_width ==1:
             outputs, attention_matrix = self((inputs, None), training=False, beam_width=beam_width)
@@ -221,7 +221,7 @@ class QuestionGenerator(tf.keras.Model):
             print("attention_matrix.shape: ", attention_matrix.shape)
             for i in range(len(proc_sentences)):
                 result_token = [self.targ_tokenizer.index_word[t] for t in outputs[i]]
-                input_sentence = [self.inp_tokenizer.index_word[t] for t in proc_sentences[i]]
+                input_sentence = [self.inp_tokenizer.index_word[t] for t in token_inputs[i]]
                 plot_attention(attention_matrix[:,i,:], input_sentence, result_token, folder=attention_plot_folder)
         if beam_width > 1:
             outputs = self((inputs, None), training=False, beam_width=beam_width)
