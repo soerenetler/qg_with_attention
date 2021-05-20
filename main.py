@@ -172,8 +172,8 @@ early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3
 tensorboard_callback = tf.keras.callbacks.TensorBoard(
     log_dir=path_to_logs, histogram_freq=1)
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir + "/model_{epoch}",
-                                                         # save_best_only=True,  # Only save a model if `val_loss` has improved.
-                                                         # monitor="val_loss",
+                                                         save_best_only=True,  # Only save a model if `val_loss` has improved.
+                                                         monitor="val_loss",
                                                          verbose=1,
                                                          )
 
