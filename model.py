@@ -221,7 +221,8 @@ class QuestionGenerator(tf.keras.Model):
             print("attention_matrix.shape: ", attention_matrix.shape)
             for i in range(len(proc_sentences)):
                 result_token = [self.targ_tokenizer.index_word[t] for t in outputs[i]]
-                plot_attention(attention_matrix[:,i,:], proc_sentences[i], result_token, folder=attention_plot_folder)
+                input_sentence = [self.inp_tokenizer.index_word[t] for t in proc_sentences[i]]
+                plot_attention(attention_matrix[:,i,:], input_sentence, result_token, folder=attention_plot_folder)
         if beam_width > 1:
             outputs = self((inputs, None), training=False, beam_width=beam_width)
             final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
