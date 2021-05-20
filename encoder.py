@@ -16,11 +16,11 @@ class Encoder(tf.keras.layers.Layer):
                                                     embedding_dim,
                                                     embeddings_initializer=tf.keras.initializers.Constant(
                                                         embedding_matrix),
-                                                    trainable=False)
+                                                    trainable=False, mask_zero=True)
         else:
             self.embedding = tf.keras.layers.Embedding(vocab_size,
                                                     embedding_dim,
-                                                    trainable=True)
+                                                    trainable=True, mask_zero=True)
 
         if self.layer == 1:
             self.gru = tf.keras.layers.GRU(self.enc_units,
