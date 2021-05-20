@@ -105,11 +105,15 @@ print("Target Language; index to word mapping")
 convert(targ_tokenizer, target_tensor_dev[0])
 
 embedding_dim = 300
-inp_embedding_matrix = generate_embeddings_matrix(
-    path_to_glove_file, inp_tokenizer, embedding_dim=embedding_dim)
+if pretrained:
+    inp_embedding_matrix = generate_embeddings_matrix(
+        path_to_glove_file, inp_tokenizer, embedding_dim=embedding_dim)
 
-targ_embedding_matrix = generate_embeddings_matrix(
-    path_to_glove_file, targ_tokenizer, embedding_dim=embedding_dim)
+    targ_embedding_matrix = generate_embeddings_matrix(
+        path_to_glove_file, targ_tokenizer, embedding_dim=embedding_dim)
+else:
+    inp_embedding_matrix = None
+    targ_embedding_matrix = None
 
 # Create a tf.data dataset
 BUFFER_SIZE = len(input_tensor_train)
