@@ -11,6 +11,7 @@ from encoder import Encoder
 from model import QuestionGenerator
 from qg_dataset import QGDataset
 from utils import convert, generate_embeddings_matrix, loss_function
+from distutils.util import strtobool
 #from bleu_score import BleuScore
 
 # PARAMS
@@ -36,7 +37,7 @@ parser.add_argument("-l", "--layer", type=int, default=1,
                     help="display a square of a given number")
 parser.add_argument("-o", "--dropout", type=float, default=0.4,
                     help="display a square of a given number")
-parser.add_argument("-p", "--pretrained", type=bool, default=False,
+parser.add_argument("-p", "--pretrained", type=lambda x: bool(strtobool(x)), default=False,
                     help="display a square of a given number")
 args = parser.parse_args()
 
