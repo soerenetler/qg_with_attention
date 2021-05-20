@@ -210,9 +210,8 @@ class QuestionGenerator(tf.keras.Model):
         proc_sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
 
         inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
-        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs,
-                                                               maxlen=self.max_length_inp,
-                                                               padding='post')
+        inputs = tf.keras.preprocessing.sequence.pad_sequences(inputs)
+                                                             # maxlen=self.max_length_inp,)
         inputs = tf.convert_to_tensor(inputs)
 
         if beam_width ==1:

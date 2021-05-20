@@ -64,8 +64,7 @@ class QGDataset:
     tensor = lang_tokenizer.texts_to_sequences(lang)
 
     tensor = tf.keras.preprocessing.sequence.pad_sequences(tensor,
-                                                          maxlen=maxlen,
-                                                          padding='post')
+                                                          maxlen=maxlen)
 
     return tensor, lang_tokenizer
 
