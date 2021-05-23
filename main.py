@@ -39,6 +39,8 @@ parser.add_argument("-o", "--dropout", type=float, default=0.4,
                     help="display a square of a given number")
 parser.add_argument("-p", "--pretrained", type=lambda x: bool(strtobool(x)), default=False,
                     help="display a square of a given number")
+parser.add_argument("-d", "--bidirectional", type=lambda x: bool(strtobool(x)), default=False,
+                    help="display a square of a given number")
 args = parser.parse_args()
 
 print(args)
@@ -79,6 +81,7 @@ BATCH_SIZE = args.batch
 units = args.units
 dropout = args.dropout
 pretrained = args.pretrained
+bidirectional = args.bidirectional
 
 
 # SAMPLES
@@ -143,7 +146,7 @@ tf.debugging.assert_shapes(
     [(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
 encoder = Encoder(vocab_inp_size, embedding_dim, units,
-                  bidirectional=True, embedding_matrix=inp_embedding_matrix,pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
+                  bidirectional=bidirectional, embedding_matrix=inp_embedding_matrix,pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
 #sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
 # sample input
 sample_output, sample_hidden = encoder(
