@@ -39,7 +39,7 @@ parser.add_argument("-o", "--dropout", type=float, default=0.4,
                     help="display a square of a given number")
 parser.add_argument("-p", "--pretrained", type=lambda x: bool(strtobool(x)), default=False,
                     help="display a square of a given number")
-parser.add_argument("-d", "--bidirectional", type=lambda x: bool(strtobool(x)), default=False,
+parser.add_argument("-r", "--bidirectional", type=lambda x: bool(strtobool(x)), default=False,
                     help="display a square of a given number")
 args = parser.parse_args()
 
