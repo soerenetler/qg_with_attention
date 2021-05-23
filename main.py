@@ -172,7 +172,7 @@ optimizer = tf.keras.optimizers.Adam()
 
 checkpoint_dir = path_to_model + 'training_checkpoints'
 
-early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3)
+early_stopping = tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=1)
 tensorboard_callback = tf.keras.callbacks.TensorBoard(
     log_dir=path_to_logs, histogram_freq=1)
 checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir + "/model_{epoch}",
