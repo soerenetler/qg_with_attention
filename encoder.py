@@ -49,13 +49,14 @@ class Encoder(tf.keras.layers.Layer):
         states = result[1:]
         print("Encoder result:", sequence.shape)
         for i, state in enumerate(states):
-            print("Encoder State ", i, state.shape)
+            print("Encoder State (before concat) ", i, state.shape)
         if self.bidirectional:
             states = tuple([tf.concat(states[i:i+2], 1)
                         for i in range(1, len(states[1:]), 1)])
         else:
             states = tuple(result[1:])
-        print("Encoder state:", states)
+        for i, state in enumerate(states):
+            print("Encoder State (after concat) ", i, state.shape)
         if len(states) == 1:
             return sequence, states[0]
         else:
