@@ -23,12 +23,12 @@ class Encoder(tf.keras.layers.Layer):
                                                        embedding_dim,
                                                        trainable=True, mask_zero=True)
 
-        if self.layer == 1:
+        if self.layer == 0:
             self.gru = tf.keras.layers.GRU(self.enc_units,
                                            return_sequences=True,
                                            return_state=True,
                                            dropout=dropout, recurrent_dropout=dropout)
-        elif self.layer > 1:
+        elif self.layer > 0:
             rnn_cells = [tf.keras.layers.GRUCell(
                 self.enc_units, dropout=dropout, recurrent_dropout=dropout) for _ in range(self.layer)]
             stacked_gru = tf.keras.layers.StackedRNNCells(rnn_cells)
@@ -52,7 +52,7 @@ class Encoder(tf.keras.layers.Layer):
             print("Encoder State (before concat) ", i, state.shape)
         if self.bidirectional:
             states = tuple([tf.concat(states[i:i+2], 1)
-                        for i in range(1, len(states[1:]), 1)])
+                        for i in range(1, len(states[1:]), 2)])
         else:
             states = tuple(result[1:])
         for i, state in enumerate(states):
