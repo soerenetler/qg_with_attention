@@ -3,7 +3,7 @@ import tensorflow_addons as tfa
 
 
 class Decoder(tf.keras.layers.Layer):
-    def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, layer=1, attention_type='luong', max_length_inp=80, max_length_targ=20, embedding_matrix=None,pretraine_embeddings=False,dropout=0.3, **kwargs):
+    def __init__(self, vocab_size, embedding_dim, dec_units, batch_sz, start_token, end_token, num_layers=1, attention_type='luong', max_length_inp=80, max_length_targ=20, embedding_matrix=None,pretraine_embeddings=False,dropout=0.3, **kwargs):
         super(Decoder, self).__init__(**kwargs)
         self.batch_sz = batch_sz
         self.dec_units = dec_units
@@ -12,7 +12,7 @@ class Decoder(tf.keras.layers.Layer):
         self.max_length_targ = max_length_targ
         self.start_token = start_token
         self.end_token = end_token
-        self.layer = layer
+        self.num_layers = num_layers
 
         # Embedding Layer
         if pretraine_embeddings:
@@ -26,16 +26,16 @@ class Decoder(tf.keras.layers.Layer):
                                                     trainable=True)
 
         # Define the fundamental cell for decoder recurrent structure
-        if self.layer == 1:
+        if self.num_layers == 1:
             self.gru = tf.keras.layers.GRUCell(self.dec_units,
                                                recurrent_initializer='glorot_uniform')
-        elif self.layer > 1:
+        elif self.num_layers > 1:
             rnn_cells = [tf.keras.layers.GRUCell(
-                self.dec_units) for _ in range(self.layer)]
+                self.dec_units) for _ in range(self.num_layers)]
             self.gru = tf.keras.layers.StackedRNNCells(rnn_cells)
         else:
             raise NotImplementedError(
-                "Number of Layer is not implemented: {}".format(self.layer))
+                "Number of Layer is not implemented: {}".format(self.num_layers))
 
         # Final Dense layer on which softmax will be applied
         self.fc = tf.keras.layers.Dense(vocab_size)
@@ -87,9 +87,9 @@ class Decoder(tf.keras.layers.Layer):
                 x, initial_state=hidden, sequence_length=self.batch_sz*[self.max_length_targ-1])
             return outputs
         elif training == False:
-            if self.layer ==1:
+            if self.num_layers ==1:
               inference_batch_size = hidden.shape[0]
-            elif self.layer > 1:
+            elif self.num_layers > 1:
               inference_batch_size = hidden[0].shape[0]
             # print("Decoder - inference_batch_size:",inference_batch_size)
             decoder_initial_state = self.build_initial_state(

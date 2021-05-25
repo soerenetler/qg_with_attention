@@ -43,20 +43,22 @@ class Encoder(tf.keras.layers.Layer):
 
     def call(self, x, training=False):
         x = self.embedding(x)
-        result = self.gru(
-            x, training=training)  # , initial_state=hidden)
-        output = result[0]
+        if self.layer == 1 or self.layer > 2:
+            result = self.gru(
+                x, training=training)  # , initial_state=hidden)
+        sequence = result[0]
+        states = result[1:]
         print("Encoder result:", result[1:])
         if self.bidirectional:
-            states = tuple([tf.concat(result[i:i+2], 1)
-                        for i in range(1, len(result[1:]), 2)])
+            states = tuple([tf.concat(states[i:i+2], 1)
+                        for i in range(1, len(states[1:]), 1)])
         else:
             states = tuple(result[1:])
         print("Encoder state:", states)
         if len(states) == 1:
-            return output, states[0]
+            return sequence, states[0]
         else:
-            return output, states
+            return sequence, states
 
 #    def initialize_hidden_state(self, batch_sz):
 #        if self.bidirectional:
