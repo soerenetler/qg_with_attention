@@ -93,11 +93,11 @@ class QuestionGenerator(tf.keras.Model):
             # tf.print("INPUT: ", inp)
             # tf.print("INPUT: ", inp)
 
-            #if self.decoder.layer ==1:
+            #if self.decoder.num_layers ==1:
             inference_batch_size = inp.shape[0]
             length_inp = inp.shape[1]
             # print("model - inference_batch_size:",inference_batch_size)
-            #elif self.decoder.layer > 1:
+            #elif self.decoder.num_layers > 1:
             #    tf.print("INPUT[0].shape: ", inp[0].shape)
             #    print("INPUT[0].shape: ", inp[0].shape)
             #    inference_batch_size = inp[0].shape[0]
@@ -109,19 +109,19 @@ class QuestionGenerator(tf.keras.Model):
                 inp, training=False)
             
             if self.encoder.bidirectional:
-                if self.decoder.layer==1:
+                if self.decoder.num_layers==1:
                     tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
                                                 (enc_hidden, (inference_batch_size, self.encoder.enc_units*2))])
-                if self.decoder.layer>1:
+                if self.decoder.num_layers>1:
                     tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units*2)),
-                                            (enc_hidden, (self.decoder.layer, inference_batch_size, self.encoder.enc_units*2))])  
+                                            (enc_hidden, (self.decoder.num_layers, inference_batch_size, self.encoder.enc_units*2))])  
             else:
-                if self.decoder.layer==1:
+                if self.decoder.num_layers==1:
                     tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
                                             (enc_hidden, (inference_batch_size, self.encoder.enc_units))])
-                if self.decoder.layer>1:
+                if self.decoder.num_layers>1:
                     tf.debugging.assert_shapes([(enc_out, (inference_batch_size, length_inp, self.encoder.enc_units)),
-                                                (enc_hidden, (self.decoder.layer, inference_batch_size, self.encoder.enc_units))])
+                                                (enc_hidden, (self.decoder.num_layers, inference_batch_size, self.encoder.enc_units))])
 
             #use GreedyEmbeddingSampler
             if beam_width == 1:
