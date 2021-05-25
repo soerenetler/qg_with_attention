@@ -48,7 +48,9 @@ class Encoder(tf.keras.layers.Layer):
                 x, training=training)  # , initial_state=hidden)
         sequence = result[0]
         states = result[1:]
-        print("Encoder result:", result[1:])
+        print("Encoder result:", sequence.shape)
+        for i, state in enumerate(states):
+            print("Encoder State ", i, state.shape)
         if self.bidirectional:
             states = tuple([tf.concat(states[i:i+2], 1)
                         for i in range(1, len(states[1:]), 1)])
