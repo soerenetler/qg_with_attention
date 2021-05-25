@@ -23,44 +23,67 @@ class Encoder(tf.keras.layers.Layer):
                                                        embedding_dim,
                                                        trainable=True, mask_zero=True)
 
-        if self.layer == 0:
-            self.gru = tf.keras.layers.GRU(self.enc_units,
-                                           return_sequences=True,
-                                           return_state=True,
-                                           dropout=dropout, recurrent_dropout=dropout)
-        elif self.layer > 0:
-            rnn_cells = [tf.keras.layers.GRUCell(
-                self.enc_units, dropout=dropout, recurrent_dropout=dropout) for _ in range(self.layer)]
-            stacked_gru = tf.keras.layers.StackedRNNCells(rnn_cells)
-            self.gru = tf.keras.layers.RNN(stacked_gru, return_sequences=True,
-                                           return_state=True)
-        else:
-            raise NotImplementedError(
-                "Layer in encoder: {}".format(self.layer))
 
-        if self.bidirectional:
-            self.gru = tf.keras.layers.Bidirectional(self.gru)
+        def init_layer():
+            if bidirectional:
+                return tf.keras.layers.Bidirectional(tf.keras.layers.GRU(
+                self.enc_units,
+                return_sequences=True,
+                return_state=True,))
+                #stateful=True)
+
+            else:
+                return tf.keras.layers.GRU(
+                    self.enc_units,
+                    return_sequences=True,
+                    return_state=True,)
+                    #stateful=True)
+
+        self._layer_names = ['layer_' + str(i) for i in range(self.layer)]
+        for name in self._layer_names:
+             self.__setattr__(name, init_layer())
+        
+
+        #if self.layer == 0:
+        #    self.gru = tf.keras.layers.GRU(self.enc_units,
+        #                                   return_sequences=True,
+        #                                   return_state=True,
+        #                                   dropout=dropout, recurrent_dropout=dropout)
+        #elif self.layer > 0:
+        #    rnn_cells = [tf.keras.layers.GRUCell(
+        #        self.enc_units, dropout=dropout, recurrent_dropout=dropout) for _ in range(self.layer)]
+        #    stacked_gru = tf.keras.layers.StackedRNNCells(rnn_cells)
+        #    self.gru = tf.keras.layers.RNN(stacked_gru, return_sequences=True,
+        #                                   return_state=True)
+        #else:
+        #    raise NotImplementedError(
+        #        "Layer in encoder: {}".format(self.layer))
+        #if self.bidirectional:
+        #    self.gru = tf.keras.layers.Bidirectional(self.gru)
 
     def call(self, x, training=False):
-        x = self.embedding(x)
-        result = self.gru(
-            x, training=training)  # , initial_state=hidden)
-        sequence = result[0]
-        states = result[1:]
-        print("Encoder result:", sequence.shape)
+        x = self.embedding(x,training=training)
+
+        seqs = x
+        states = []
+        for name in self._layer_names:
+            rnn = self.__getattribute__(name)
+            output = rnn(seqs)
+            if self.bidirectional:
+                seqs = output[0]
+                states = tf.concat(output[1:],1)
+            else:
+                (seqs, state) = output
+            states.append(state)
+
+        print("Encoder result:", seqs.shape)
         for i, state in enumerate(states):
-            print("Encoder State (before concat) ", i, state.shape)
-        if self.bidirectional:
-            states = tuple([tf.concat(states[i:i+2], 1)
-                        for i in range(1, len(states[1:]), 2)])
-        else:
-            states = tuple(result[1:])
-        for i, state in enumerate(states):
-            print("Encoder State (after concat) ", i, state.shape)
+            print("Encoder State", i, state.shape)
+
         if len(states) == 1:
-            return sequence, states[0]
+            return seqs, states[0]
         else:
-            return sequence, states
+            return seqs, states        
 
 #    def initialize_hidden_state(self, batch_sz):
 #        if self.bidirectional:
