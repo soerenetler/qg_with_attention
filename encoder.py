@@ -43,9 +43,8 @@ class Encoder(tf.keras.layers.Layer):
 
     def call(self, x, training=False):
         x = self.embedding(x)
-        if self.layer == 1 or self.layer > 2:
-            result = self.gru(
-                x, training=training)  # , initial_state=hidden)
+        result = self.gru(
+            x, training=training)  # , initial_state=hidden)
         sequence = result[0]
         states = result[1:]
         print("Encoder result:", sequence.shape)
