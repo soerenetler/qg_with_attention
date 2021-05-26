@@ -83,7 +83,7 @@ class Encoder(tf.keras.layers.Layer):
         if len(states) == 1:
             return seqs, states[0]
         else:
-            return seqs, states        
+            return seqs, tuple(states)       
 
 #    def initialize_hidden_state(self, batch_sz):
 #        if self.bidirectional:
