@@ -225,8 +225,8 @@ qg.translate(
 qg.translate([['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
               'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.']], beam_width=3)
 
-dev_sentences, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
-chunks = [dev_sentences[x:x+64] for x in range(0, len(dev_sentences), 64)]
+dev_ans_sent, dev_ans_token, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
+chunks = [dev_ans_sent[x:x+64] for x in range(0, len(dev_ans_sent), 64)]
 for chunk in chunks:
     outputs = qg.translate(chunk, beam_width=3)
 
