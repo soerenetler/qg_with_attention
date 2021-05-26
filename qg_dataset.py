@@ -41,7 +41,7 @@ class QGDataset:
     df = pd.read_csv(path)
     df["answer_sentence_token"] = [ast.literal_eval(t) for t in df["answer_sentence_token"]]
     df["question_token"] = [ast.literal_eval(t) for t in df["question_token"]]
-    df["answer"] = [t.split(" ") for t in df["answer"]]
+    df["answer"] = [str(t).split(" ") for t in df["answer"]]
 
     #from plotly import express
     #display(express.histogram(x=[len(t) for t in df["answer_sentence_token"]]))
