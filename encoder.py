@@ -71,7 +71,7 @@ class Encoder(tf.keras.layers.Layer):
             output = rnn(seqs)
             if self.bidirectional:
                 seqs = output[0]
-                states = tf.concat(output[1:],1)
+                state = tf.concat(output[1:],1)
             else:
                 (seqs, state) = output
             states.append(state)
