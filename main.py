@@ -212,16 +212,17 @@ qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[
 
 # qg.save(path_to_model+"saved_model/")
 
-qg.translate([['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a', 'three',
-             'album', 'deal', 'with', ',', 'which', 'left', '.']], attention_plot_folder=path_to_model)
+qg.translate([['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a',
+               'three', 'album', 'deal', 'with', 'spinefarm', ',', 'which', 'left', 'marko', 'displeased', '.']], attention_plot_folder=path_to_model)
 qg.translate([["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capital", "of",
              "the", "German", "state", "of", "Brandenburg", "."]], attention_plot_folder=path_to_model)
-qg.translate(["the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" ")],
+qg.translate(["the largest of these is the eldon square shopping centre , one of the largest city centre shopping complexes in the uk .".split(" ")],
              attention_plot_folder=path_to_model)
 qg.translate(["The name of the person is John .".split(" ")], attention_plot_folder=path_to_model)
+qg.translate(["John is the name of the person .".split(" ")], attention_plot_folder=path_to_model)
 
 qg.translate(
-    ["the largest of these is the eldon square shop-ping centre , one of the largest city centre shopping com-plexes in the uk .".split(" ")], beam_width=3)
+    ["the largest of these is the eldon square shopping centre , one of the largest city centre shopping complexes in the uk .".split(" ")], beam_width=3)
 qg.translate([['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
               'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.']], beam_width=3)
 
