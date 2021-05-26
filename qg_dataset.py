@@ -36,18 +36,21 @@ class QGDataset:
 
   # 1. Remove the accents
   # 2. Clean the sentences
-  # 3. Return word pairs in the format: [ENGLISH, SPANISH]
+  # 3. Return word pairs in the format: [answer_sentence, answer_token, question]
   def create_dataset(self, path):
     df = pd.read_csv(path)
     df["answer_sentence_token"] = [ast.literal_eval(t) for t in df["answer_sentence_token"]]
     df["question_token"] = [ast.literal_eval(t) for t in df["question_token"]]
+    df["answer_token"] = [ast.literal_eval(t) for t in df["answer_token"]]
 
     #from plotly import express
     #display(express.histogram(x=[len(t) for t in df["answer_sentence_token"]]))
 
     #display(df["answer_sentence_token"].head(50))
 
-    sentence_pairs = zip(df["answer_sentence_token"].apply(self.preprocess_sentence), df["question_token"].apply(self.preprocess_sentence))
+    sentence_pairs = zip(df["answer_sentence_token"].apply(self.preprocess_sentence),
+                         df["answer_token"].apply(self.preprocess_sentence),
+                         df["question_token"].apply(self.preprocess_sentence))
     
     return zip(*sentence_pairs)
 
@@ -68,27 +71,38 @@ class QGDataset:
 
     return tensor, lang_tokenizer
 
-  def load_dataset(self, max_length_inp, max_vocab_inp, max_length_targ, max_vocab_targ):
+  def load_dataset(self, max_length_ans_sent, max_length_ans_token, max_vocab_inp, max_length_targ, max_vocab_targ):
     # creating cleaned input, output pairs
-    inp_lang_train, targ_lang_train = self.create_dataset(self.train_path)
-    inp_lang_dev, targ_lang_dev = self.create_dataset(self.dev_path)
+    ans_sent_train, ans_token_train, targ_lang_train = self.create_dataset(self.train_path)
+    ans_sent_dev, ans_token_dev, targ_lang_dev = self.create_dataset(self.dev_path)
 
-    print(inp_lang_train[-1])
-    print(targ_lang_train[-1])
+    print("ans_sent_train[-1]: ",ans_sent_train[-1])
+    print("ans_token_train[-1]: ", ans_token_train[-1])
+    print("targ_lang_train[-1]: ", targ_lang_train[-1])
 
-    input_tensor, inp_lang_tokenizer = self.tokenize(inp_lang_train, max_length_inp, max_vocab=max_vocab_inp)
-    target_tensor, targ_lang_tokenizer = self.tokenize(targ_lang_train, max_length_targ, max_vocab=max_vocab_targ)
+    # TRAIN Tensors and Tokenizer
+    ans_sent_tensor_train, inp_lang_tokenizer = self.tokenize(ans_sent_train, max_length_ans_sent, max_vocab=max_vocab_inp)
+    target_tensor_train, targ_lang_tokenizer = self.tokenize(targ_lang_train, max_length_targ, max_vocab=max_vocab_targ)
+    
+    ans_token_tensor_train = inp_lang_tokenizer.texts_to_sequences(ans_token_train)
+    ans_token_tensor_pad_train = tf.keras.preprocessing.sequence.pad_sequences(ans_token_tensor_train,maxlen=max_length_ans_token,padding='post')
 
-    print("inp_lang_dev[0]: ", inp_lang_dev[0])
-    print("targ_lang_dev[0] ", targ_lang_dev[0])
-    input_tensor_dev = inp_lang_tokenizer.texts_to_sequences(inp_lang_dev)
+    # DEV Tensors
+    ans_sent_tensor_dev = inp_lang_tokenizer.texts_to_sequences(ans_sent_dev)
+    ans_token_tensor_dev = inp_lang_tokenizer.texts_to_sequences(ans_token_dev)
+
     target_tensor_dev = targ_lang_tokenizer.texts_to_sequences(targ_lang_dev)
-    print("input_tensor_dev[0]: ", input_tensor_dev[0])
+
+    print("ans_sent_tensor_dev[0]: ", ans_sent_tensor_dev[0])
+    print("ans_token_tensor_dev[0]: ", ans_token_tensor_dev[0])
     print("target_tensor_dev[0] ", target_tensor_dev[0])
 
-    input_tensor_pad_dev = tf.keras.preprocessing.sequence.pad_sequences(input_tensor_dev,maxlen=max_length_inp,padding='post')
+    # Padding Dev Tensor
+    ans_sent_tensor_pad_dev = tf.keras.preprocessing.sequence.pad_sequences(ans_sent_tensor_dev,maxlen=max_length_ans_sent,padding='post')
+    ans_token_tensor_pad_dev = tf.keras.preprocessing.sequence.pad_sequences(ans_token_tensor_dev,maxlen=max_length_ans_token,padding='post')
     target_tensor_pad_dev = tf.keras.preprocessing.sequence.pad_sequences(target_tensor_dev,maxlen=max_length_targ,padding='post')
-    print("input_tensor_pad_dev[0]: ", input_tensor_pad_dev[0])
+    print("ans_sent_tensor_pad_dev[0]: ", ans_sent_tensor_pad_dev[0])
+    print("ans_token_tensor_pad_dev[0]: ", ans_token_tensor_pad_dev[0])
     print("target_tensor_pad_dev[0] ", target_tensor_pad_dev[0])
 
-    return input_tensor, target_tensor, input_tensor_pad_dev, target_tensor_pad_dev, inp_lang_tokenizer, targ_lang_tokenizer
+    return ans_sent_tensor_train, ans_token_tensor_pad_train, target_tensor_train, ans_sent_tensor_pad_dev, ans_token_tensor_dev, target_tensor_pad_dev, inp_lang_tokenizer, targ_lang_tokenizer

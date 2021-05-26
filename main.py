@@ -39,7 +39,9 @@ parser.add_argument("-o", "--dropout", type=float, default=0.3,
                     help="display a square of a given number")
 parser.add_argument("-p", "--pretrained", type=lambda x: bool(strtobool(x)), default=False,
                     help="display a square of a given number")
-parser.add_argument("-r", "--bidirectional", type=lambda x: bool(strtobool(x)), default=False,
+parser.add_argument("-r", "--bidirectional", type=lambda x: bool(strtobool(x)), default=True,
+                    help="display a square of a given number")
+parser.add_argument("-a", "--answer_units", type=int, default=0,
                     help="display a square of a given number")
 args = parser.parse_args()
 
@@ -82,27 +84,36 @@ units = args.units
 dropout = args.dropout
 pretrained = args.pretrained
 bidirectional = args.bidirectional
+answer_enc_units = args.answer_units
 
 
 # SAMPLES
 sample_answer_sentence = ['3245', 'two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a',
                           'three', 'album', 'deal', 'with', 'spinefarm', ',', 'which', 'left', 'marko', 'displeased', '.']
 sample_question_sentence = ['what', 'label', 'were', 'they', 'with', '?']
+sample_answer = ['spinefarm']
 
 qg_dataset = QGDataset()
 print(qg_dataset.preprocess_sentence(sample_answer_sentence))
 print(qg_dataset.preprocess_sentence(sample_question_sentence))
+print(qg_dataset.preprocess_sentence(sample_answer))
 
-input_tensor_train, target_tensor_train, input_tensor_dev, target_tensor_dev, inp_tokenizer, targ_tokenizer = qg_dataset.load_dataset(
-    max_length_inp=max_length_inp, max_vocab_inp=max_vocab_inp, max_length_targ=max_length_targ, max_vocab_targ=max_vocab_targ)
+ans_sent_tensor_train, ans_token_tensor_train, target_tensor_train, ans_sent_tensor_dev, ans_token_tensor_dev, target_tensor_dev, inp_tokenizer, targ_tokenizer = qg_dataset.load_dataset(
+    max_length_ans_sent=max_length_inp, max_length_ans_token=10, max_vocab_inp=max_vocab_inp, max_length_targ=max_length_targ, max_vocab_targ=max_vocab_targ)
 
-print("len input_tensor_train: ", len(input_tensor_train))
+print("len ans_sent_tensor_train: ", len(ans_sent_tensor_train))
+print("len ans_token_tensor_train: ", len(ans_token_tensor_train))
 print("len target_tensor_train: ", len(target_tensor_train))
-print("len input_tensor_dev: ", len(input_tensor_dev))
+
+print("len input_tensor_dev: ", len(ans_sent_tensor_dev))
+print("len input_tensor_dev: ", len(ans_token_tensor_dev))
 print("len target_tensor_dev", len(target_tensor_dev))
 
 print("Input Language; index to word mapping")
-convert(inp_tokenizer, input_tensor_dev[0])
+convert(inp_tokenizer, ans_sent_tensor_dev[0])
+print()
+print("Input Language; index to word mapping")
+convert(inp_tokenizer, ans_token_tensor_dev[0])
 print()
 print("Target Language; index to word mapping")
 convert(targ_tokenizer, target_tensor_dev[0])
@@ -113,24 +124,24 @@ if pretrained:
         path_to_glove_file, inp_tokenizer, embedding_dim=embedding_dim)
 
     targ_embedding_matrix = generate_embeddings_matrix(
-        path_to_glove_file, targ_tokenizer, embedding_dim=embedding_dim)
+        path_to_glove_file, targ_tokenizer, embedding_dim=embedding_dim)        
 else:
     inp_embedding_matrix = None
     targ_embedding_matrix = None
 
 # Create a tf.data dataset
-BUFFER_SIZE = len(input_tensor_train)
+BUFFER_SIZE = len(ans_sent_tensor_dev)
 
-steps_per_epoch = len(input_tensor_train)//BATCH_SIZE
+steps_per_epoch = len(ans_sent_tensor_dev)//BATCH_SIZE
 vocab_inp_size = len(inp_tokenizer.word_index)+1  # PADDING
 vocab_tar_size = len(targ_tokenizer.word_index)+1
 
 dataset = tf.data.Dataset.from_tensor_slices(
-    (input_tensor_train, target_tensor_train)).shuffle(BUFFER_SIZE)
+    (ans_sent_tensor_train, target_tensor_train)).shuffle(BUFFER_SIZE)
 dataset = dataset.batch(BATCH_SIZE, drop_remainder=True)
 
 dataset_val = tf.data.Dataset.from_tensor_slices(
-    (input_tensor_dev, target_tensor_dev))
+    (ans_sent_tensor_dev, target_tensor_dev))
 dataset_val = dataset_val.batch(BATCH_SIZE, drop_remainder=True)
 
 example_input_batch, example_target_batch = next(iter(dataset))
@@ -145,11 +156,17 @@ tf.debugging.assert_shapes(
 tf.debugging.assert_shapes(
     [(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
-encoder = Encoder(vocab_inp_size, embedding_dim, units,
+# answer sentence encoder
+ans_sent_encoder = Encoder(vocab_inp_size, embedding_dim, units,
                   bidirectional=bidirectional, embedding_matrix=inp_embedding_matrix,pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
-#sample_hidden = encoder.initialize_hidden_state(BATCH_SIZE)
+
+# target answer encoder
+if answer_enc_units > 0:
+    ans_token_encoder = Encoder(vocab_inp_size, embedding_dim, answer_enc_units,
+                                bidirectional=bidirectional, embedding_matrix=inp_embedding_matrix, pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
+
 # sample input
-sample_output, sample_hidden = encoder(
+sample_output, sample_hidden = ans_sent_encoder(
     example_input_batch, training=True)
 tf.debugging.assert_shapes(
     [(sample_output, (BATCH_SIZE, max_length_inp, units))])
@@ -184,7 +201,7 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir
                                                          verbose=1,
                                                          )
 
-qg = QuestionGenerator(qg_dataset, inp_tokenizer, encoder,
+qg = QuestionGenerator(qg_dataset, inp_tokenizer, ans_sent_encoder,
                        decoder, targ_tokenizer, max_length_inp)
 qg.compile(optimizer=optimizer, loss=loss_function)
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
