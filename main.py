@@ -230,8 +230,19 @@ dev_ans_sent, dev_ans_token, dev_questions = qg_dataset.create_dataset(qg_datase
 chunks = [dev_ans_sent[x:x+64] for x in range(0, len(dev_ans_sent), 64)]
 for chunk in chunks:
     outputs = qg.translate(chunk, beam_width=3)
+    filename = "dev.txt"
 
-    filename = modelname + ".txt"
+    with open(path_to_model + filename, "a") as f:
+        for output in outputs:
+            f.write(str(output))
+            f.write('\n')
+
+test_ans_sent, test_ans_token, test_questions = qg_dataset.create_dataset(qg_dataset.test_path)
+chunks = [dev_ans_sent[x:x+64] for x in range(0, len(dev_ans_sent), 64)]
+for chunk in chunks:
+    outputs = qg.translate(chunk, beam_width=3)
+
+    filename = "test.txt"
 
     with open(path_to_model + filename, "a") as f:
         for output in outputs:
