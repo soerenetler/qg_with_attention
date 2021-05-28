@@ -19,8 +19,10 @@ class QGDataset:
     return ''.join(c for c in unicodedata.normalize('NFD', s)
         if unicodedata.category(c) != 'Mn')
   
-  def preprocess_sentence(self, w):
-    w_result = ['<start>']
+  def preprocess_sentence(self, w, include_eos_bos = True):
+    w_result = []
+    if include_eos_bos:
+      w_result.append('<start>')
     for t in w:
       t = self.unicode_to_ascii(t.strip()) #.lower()
 
@@ -32,7 +34,8 @@ class QGDataset:
         w_result.append(t)
     # adding a start and an end token to the sentence
     # so that the model know when to start and stop predicting.
-    w_result.append('<end>')
+    if include_eos_bos:
+      w_result.append('<end>')
     return w_result
 
   # 1. Remove the accents
@@ -49,8 +52,8 @@ class QGDataset:
 
     #display(df["answer_sentence_token"].head(50))
 
-    sentence_pairs = zip(df["answer_sentence_token"].apply(self.preprocess_sentence),
-                         df["answer"].apply(self.preprocess_sentence),
+    sentence_pairs = zip(df["answer_sentence_token"].apply(self.preprocess_sentence, include_eos_bos=False),
+                         df["answer"].apply(self.preprocess_sentence, include_eos_bos=False),
                          df["question_token"].apply(self.preprocess_sentence))
     
     return zip(*sentence_pairs)
