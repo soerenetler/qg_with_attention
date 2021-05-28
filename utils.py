@@ -15,7 +15,10 @@ def generate_embeddings_matrix(path_to_glove_file, tokenizer, embedding_dim=300)
         for line in f:
             values = line.split()
             word = values[0]
-            coefs = np.asarray(values[1:], "float32")
+            try:
+                coefs = np.asarray(values[1:], "float32")
+            except ValueError:
+                print(values)
             embeddings_index[word] = coefs
 
     print("Found {} word vectors in {}.".format(
