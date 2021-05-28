@@ -38,7 +38,7 @@ def generate_embeddings_matrix(path_to_glove_file, tokenizer, embedding_dim=300)
             misses_list.append(word)
             misses += 1
 
-    with open("misses.txt", "wa") as f:
+    with open("misses.txt", "a") as f:
         for element in misses_list:
             f.write(element + "\n")
 
