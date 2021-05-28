@@ -14,11 +14,15 @@ def generate_embeddings_matrix(path_to_glove_file, tokenizer, embedding_dim=300)
     with open(path_to_glove_file) as f:
         for line in f:
             word, coefs = line.split(maxsplit=1)
-            coefs = np.fromstring(coefs, "f", sep=" ")
+            coefs = np.asarray(coefs, "float32")
             embeddings_index[word] = coefs
 
     print("Found {} word vectors in {}.".format(
         len(embeddings_index), path_to_glove_file))
+
+    print("king: ", embeddings_index["king"])
+    print("in: ", embeddings_index["in"])
+    print("the: ", embeddings_index["the"])
 
     hits = 0
     misses = 0
