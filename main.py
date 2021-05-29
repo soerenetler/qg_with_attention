@@ -137,22 +137,26 @@ vocab_inp_size = len(inp_tokenizer.word_index)+1  # PADDING
 vocab_tar_size = len(targ_tokenizer.word_index)+1
 
 dataset = tf.data.Dataset.from_tensor_slices(
-    (ans_sent_tensor_train, target_tensor_train)).shuffle(BUFFER_SIZE)
+    (ans_sent_tensor_train, ans_token_tensor_train, target_tensor_train)).shuffle(BUFFER_SIZE)
 dataset = dataset.batch(BATCH_SIZE, drop_remainder=True)
 
 dataset_val = tf.data.Dataset.from_tensor_slices(
-    (ans_sent_tensor_dev, target_tensor_dev))
+    (ans_sent_tensor_dev, ans_token_tensor_dev, target_tensor_dev))
 dataset_val = dataset_val.batch(BATCH_SIZE, drop_remainder=True)
 
-example_input_batch, example_target_batch = next(iter(dataset))
+example_ans_sent_batch, example_ans_token_batch, example_target_batch = next(iter(dataset))
 tf.debugging.assert_shapes(
-    [(example_input_batch, (BATCH_SIZE, max_length_inp))])
+    [(example_ans_sent_batch, (BATCH_SIZE, max_length_inp))])
+tf.debugging.assert_shapes(
+    [(example_ans_token_batch, (BATCH_SIZE, 10))])
 tf.debugging.assert_shapes(
     [(example_target_batch, (BATCH_SIZE, max_length_targ))])
 
-example_input_batch_val, example_target_batch_val = next(iter(dataset_val))
+example_ans_sent_batch_val, example_ans_token_batch_val,example_target_batch_val = next(iter(dataset_val))
 tf.debugging.assert_shapes(
-    [(example_input_batch_val, (BATCH_SIZE, max_length_inp))])
+    [(example_ans_sent_batch_val, (BATCH_SIZE, max_length_inp))])
+tf.debugging.assert_shapes(
+    [(example_ans_token_batch_val, (BATCH_SIZE, 10))])
 tf.debugging.assert_shapes(
     [(example_target_batch_val, (BATCH_SIZE, max_length_targ))])
 
@@ -167,10 +171,9 @@ if answer_enc_units > 0:
 
 # sample input
 sample_output, sample_hidden = ans_sent_encoder(
-    example_input_batch, training=True)
+    example_ans_sent_batch, training=True)
 tf.debugging.assert_shapes(
     [(sample_output, (BATCH_SIZE, max_length_inp, units))])
-print("sample_hidden: ", sample_hidden)
 if layer == 1:
     tf.debugging.assert_shapes([(sample_hidden, (BATCH_SIZE, units))])
 else:

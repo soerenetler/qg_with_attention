@@ -16,10 +16,10 @@ class QuestionGenerator(tf.keras.Model):
     # Training
     @tf.function
     def train_step(self, data):
-        inp, targ = data
+        ans_sentence, ans_token, targ = data
 
         with tf.GradientTape() as tape:
-            pred = self((inp, targ), training=True, beam_width=1)
+            pred = self((ans_sentence, targ), training=True, beam_width=1)
             #print("TRAIN - targ", targ[0])
             real = targ[:, 1:]         # ignore <start> token
             #print("Train - REAL", real[0])
@@ -43,9 +43,9 @@ class QuestionGenerator(tf.keras.Model):
     @tf.function
     def test_step(self, data):
         # Unpack the data
-        inp, targ = data
+        ans_sentence, ans_token, targ = data
         # Compute predictions
-        pred = self((inp, targ), training=False, beam_width=None)
+        pred = self((ans_sentence, targ), training=False, beam_width=None)
         #print("TEST - targ", targ[0])
         real = targ[:, 1:]
 
