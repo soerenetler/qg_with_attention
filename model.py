@@ -207,7 +207,7 @@ class QuestionGenerator(tf.keras.Model):
 
 
     def translate(self, sentences, beam_width=1, attention_plot_folder=""):
-        proc_sentences = [self.qg_dataset.preprocess_sentence(sentence) for sentence in sentences]
+        proc_sentences = [self.qg_dataset.preprocess_sentence(sentence, include_eos_bos=False) for sentence in sentences]
 
         token_inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
         pad_inputs = tf.keras.preprocessing.sequence.pad_sequences(token_inputs, padding="post")
