@@ -1,5 +1,6 @@
 import unicodedata
 import pandas as pd
+import re
 
 import ast
 
@@ -27,9 +28,12 @@ class QGDataset:
       t = self.unicode_to_ascii(t.strip()) #.lower()
 
       # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-      #t = re.sub(r"[^a-zA-Z\d?.!,¿]+", " ", t)
-
-      #t = t.strip()
+      #t = re.sub(r"[^a-zA-Z\d?.!,]+", " ", t)
+      t = re.sub("<<whitespace>>", " ", t)
+      t = re.sub(r"\.\[.*$", " ", t)
+      t = re.sub(r"\[.*$", " ", t)
+      #t = t.strip(".")
+      t = t.strip()
       if t != '':
         w_result.append(t)
     # adding a start and an end token to the sentence
