@@ -110,8 +110,8 @@ class QuestionGenerator(tf.keras.Model):
             # tf.print("INPUT: ", inp)
 
             #if self.decoder.num_layers ==1:
-            inference_batch_size = inp.shape[0]
-            length_inp = inp.shape[1]
+            inference_batch_size = ans_sentence.shape[0]
+            length_inp = ans_sentence.shape[1]
             # print("model - inference_batch_size:",inference_batch_size)
             #elif self.decoder.num_layers > 1:
             #    tf.print("INPUT[0].shape: ", inp[0].shape)
@@ -122,7 +122,7 @@ class QuestionGenerator(tf.keras.Model):
             #enc_hidden = self.encoder.initialize_hidden_state(inference_batch_size)
 
             enc_out, enc_hidden = self.encoder(
-                inp, training=False)
+                ans_sentence, training=False)
 
             if self.ans_encoder:
                 ans_enc_output, ans_enc_hidden = self.ans_encoder(
