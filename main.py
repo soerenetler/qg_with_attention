@@ -218,23 +218,24 @@ qg.fit(dataset, epochs=EPOCHS, batch_size=BATCH_SIZE, callbacks=[
 # qg.save(path_to_model+"saved_model/")
 
 qg.translate([['two', 'months', 'later', 'the', 'band', 'got', 'signed', 'to', 'a',
-               'three', 'album', 'deal', 'with', 'spinefarm', ',', 'which', 'left', 'marko', 'displeased', '.']], attention_plot_folder=path_to_model)
+               'three', 'album', 'deal', 'with', 'spinefarm', ',', 'which', 'left', 'marko', 'displeased', '.']], [['spinefarm']], attention_plot_folder=path_to_model)
 qg.translate([["Golm", "is", "a", "locality", "of", "Potsdam", ",", "the", "capital", "of",
-             "the", "German", "state", "of", "Brandenburg", "."]], attention_plot_folder=path_to_model)
-qg.translate(["the largest of these is the eldon square shopping centre , one of the largest city centre shopping complexes in the uk .".split(" ")],
+             "the", "German", "state", "of", "Brandenburg", "."]], [["Potsdam"]], attention_plot_folder=path_to_model)
+qg.translate(["the largest of these is the eldon square shopping centre , one of the largest city centre shopping complexes in the uk .".split(" ")], [["the", "eldon", "square", "shopping", "centre"]],
              attention_plot_folder=path_to_model)
-qg.translate(["The name of the person is John .".split(" ")], attention_plot_folder=path_to_model)
-qg.translate(["John is the name of the person .".split(" ")], attention_plot_folder=path_to_model)
+qg.translate(["The name of the person is John .".split(" ")], [["John"]], attention_plot_folder=path_to_model)
+qg.translate(["John is the name of the person .".split(" ")], [["John"]], attention_plot_folder=path_to_model)
 
 qg.translate(
-    ["the largest of these is the eldon square shopping centre , one of the largest city centre shopping complexes in the uk .".split(" ")], beam_width=3)
+    ["the largest of these is the eldon square shopping centre , one of the largest city centre shopping complexes in the uk .".split(" ")], [["the", "eldon", "square", "shopping", "centre"]],beam_width=3)
 qg.translate([['Golm', 'is', 'a', 'locality', 'of', 'Potsdam', ',', 'the',
-              'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.']], beam_width=3)
+              'capital', 'of', 'the', 'German', 'state', 'of', 'Brandenburg', '.']], [["Potsdam"]], beam_width=3)
 
 dev_ans_sent, dev_ans_token, dev_questions = qg_dataset.create_dataset(qg_dataset.dev_path)
-chunks = [dev_ans_sent[x:x+64] for x in range(0, len(dev_ans_sent), 64)]
-for chunk in chunks:
-    outputs = qg.translate(chunk, beam_width=3)
+ans_sent_chunks = [dev_ans_sent[x:x+64] for x in range(0, len(dev_ans_sent), 64)]
+ans_token_chunks = [dev_ans_token[x:x+64] for x in range(0, len(dev_ans_token), 64)]
+for ans_sent_chunk, ans_token_chunk in zip(ans_sent_chunks, ans_token_chunks):
+    outputs = qg.translate(ans_sent_chunk, ans_token_chunk, beam_width=3)
     filename = "dev.txt"
 
     with open(path_to_model + filename, "a") as f:
@@ -243,9 +244,10 @@ for chunk in chunks:
             f.write('\n')
 
 test_ans_sent, test_ans_token, test_questions = qg_dataset.create_dataset(qg_dataset.test_path)
-chunks = [test_ans_sent[x:x+64] for x in range(0, len(test_ans_sent), 64)]
-for chunk in chunks:
-    outputs = qg.translate(chunk, beam_width=3)
+ans_sent_chunks = [test_ans_sent[x:x+64] for x in range(0, len(test_ans_sent), 64)]
+ans_token_chunks = [test_ans_token[x:x+64] for x in range(0, len(test_ans_token), 64)]
+for ans_sent_chunk, ans_token_chunk in zip(ans_sent_chunks, ans_token_chunks):
+    outputs = qg.translate(ans_sent_chunk, ans_token_chunk, beam_width=3)
 
     filename = "test.txt"
 

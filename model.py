@@ -83,7 +83,8 @@ class QuestionGenerator(tf.keras.Model):
                 enc_hidden = tf.concat([enc_hidden, ans_enc_hidden], 1)
                 full_hidden = self.dim_fit_fc(enc_hidden)
                 print("full_hidden.shape", full_hidden.shape)
-                tf.split(full_hidden, self.decoder.num_layers)
+                if self.decoder.num_layer > 1:
+                    tf.split(full_hidden, self.decoder.num_layers)
                 enc_hidden = full_hidden
 
             # Set the AttentionMechanism object with encoder_outputs
@@ -132,7 +133,8 @@ class QuestionGenerator(tf.keras.Model):
                 enc_hidden = tf.concat([enc_hidden, ans_enc_hidden], 1)
                 full_hidden = self.dim_fit_fc(enc_hidden)
                 print("full_hidden.shape", full_hidden.shape)
-                tf.split(full_hidden, self.decoder.num_layers)
+                if self.decoder.num_layer > 1:
+                    tf.split(full_hidden, self.decoder.num_layers)
                 enc_hidden = full_hidden
             
             if self.encoder.bidirectional:
@@ -233,25 +235,32 @@ class QuestionGenerator(tf.keras.Model):
 
 
 
-    def translate(self, sentences, beam_width=1, attention_plot_folder=""):
-        proc_sentences = [self.qg_dataset.preprocess_sentence(sentence, include_eos_bos=False) for sentence in sentences]
+    def translate(self, sentences, ans_tokens, beam_width=1, attention_plot_folder=""):
+        proc_ans_sent = [self.qg_dataset.preprocess_sentence(sentence, include_eos_bos=False) for sentence in sentences]
+        proc_ans_token = [self.qg_dataset.preprocess_sentence(ans_token, include_eos_bos=False) for ans_token in ans_tokens]
 
-        token_inputs = self.inp_tokenizer.texts_to_sequences(proc_sentences)
-        pad_inputs = tf.keras.preprocessing.sequence.pad_sequences(token_inputs, padding="post")
+        token_ans_sent_inputs = self.inp_tokenizer.texts_to_sequences(proc_ans_sent)
+        token_ans_token_inputs = self.inp_tokenizer.texts_to_sequences(proc_ans_token)
+
+        pad_ans_sent_inputs = tf.keras.preprocessing.sequence.pad_sequences(token_ans_sent_inputs, padding="post")
                                                              # maxlen=self.max_length_inp,)
-        inputs = tf.convert_to_tensor(pad_inputs)
+        pad_ans_token_inputs = tf.keras.preprocessing.sequence.pad_sequences(token_ans_token_inputs, padding="post")
+                                                             # maxlen=self.max_length_inp,)
+        
+        ans_sent = tf.convert_to_tensor(pad_ans_sent_inputs)
+        ans_token = tf.convert_to_tensor(pad_ans_token_inputs)
 
         if beam_width ==1:
-            outputs, attention_matrix = self((inputs, None, None), training=False, beam_width=beam_width)
+            outputs, attention_matrix = self((ans_sent, ans_token, None), training=False, beam_width=beam_width)
             outputs = outputs.sample_id.numpy()
             result_str = self.targ_tokenizer.sequences_to_texts(outputs)
             print("attention_matrix.shape: ", attention_matrix.shape)
-            for i in range(len(proc_sentences)):
+            for i in range(len(proc_ans_sent)):
                 result_token = [self.targ_tokenizer.index_word[t] for t in outputs[i]]
-                input_sentence = [self.inp_tokenizer.index_word[t] for t in token_inputs[i]]
+                input_sentence = [self.inp_tokenizer.index_word[t] for t in token_ans_sent_inputs[i]]
                 plot_attention(attention_matrix[:,i,:], input_sentence, result_token, folder=attention_plot_folder)
         if beam_width > 1:
-            outputs = self((inputs, None, None), training=False, beam_width=beam_width)
+            outputs = self((ans_sent, ans_token, None), training=False, beam_width=beam_width)
             final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
             beam_scores = tf.transpose(
                 outputs.beam_search_decoder_output.scores, perm=(0, 2, 1))
