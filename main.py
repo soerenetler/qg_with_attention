@@ -109,10 +109,6 @@ print("len input_tensor_dev: ", len(ans_sent_tensor_dev))
 print("len input_tensor_dev: ", len(ans_token_tensor_dev))
 print("len target_tensor_dev", len(target_tensor_dev))
 
-print("shape input_tensor_dev: ", ans_sent_tensor_dev.shape)
-print("shape input_tensor_dev: ", ans_token_tensor_dev.shape)
-print("shape target_tensor_dev", target_tensor_dev.shape)
-
 print("Input Language; index to word mapping")
 convert(inp_tokenizer, ans_sent_tensor_dev[0])
 print()
