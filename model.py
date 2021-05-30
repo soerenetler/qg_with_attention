@@ -23,7 +23,7 @@ class QuestionGenerator(tf.keras.Model):
         ans_sentence, ans_token, targ = data
 
         with tf.GradientTape() as tape:
-            pred = self((ans_sentence, targ), training=True, beam_width=1)
+            pred = self((ans_sentence, ans_token, targ), training=True, beam_width=1)
             #print("TRAIN - targ", targ[0])
             real = targ[:, 1:]         # ignore <start> token
             #print("Train - REAL", real[0])
@@ -100,8 +100,8 @@ class QuestionGenerator(tf.keras.Model):
             tf.print("qg_inputs:", qg_inputs)
             if type(qg_inputs) == tf.Tensor:
                 inp = qg_inputs
-            elif len(qg_inputs) == 2:
-                inp, targ = qg_inputs
+            elif len(qg_inputs) == 3:
+                ans_sentence, ans_token, targ = qg_inputs
                 tf.print("targ: ", targ)
             else:
                 raise NotImplementedError(
@@ -242,7 +242,7 @@ class QuestionGenerator(tf.keras.Model):
         inputs = tf.convert_to_tensor(pad_inputs)
 
         if beam_width ==1:
-            outputs, attention_matrix = self((inputs, None), training=False, beam_width=beam_width)
+            outputs, attention_matrix = self((inputs, None, None), training=False, beam_width=beam_width)
             outputs = outputs.sample_id.numpy()
             result_str = self.targ_tokenizer.sequences_to_texts(outputs)
             print("attention_matrix.shape: ", attention_matrix.shape)
@@ -251,7 +251,7 @@ class QuestionGenerator(tf.keras.Model):
                 input_sentence = [self.inp_tokenizer.index_word[t] for t in token_inputs[i]]
                 plot_attention(attention_matrix[:,i,:], input_sentence, result_token, folder=attention_plot_folder)
         if beam_width > 1:
-            outputs = self((inputs, None), training=False, beam_width=beam_width)
+            outputs = self((inputs, None, None), training=False, beam_width=beam_width)
             final_outputs = tf.transpose(outputs.predicted_ids, perm=(0, 2, 1))
             beam_scores = tf.transpose(
                 outputs.beam_search_decoder_output.scores, perm=(0, 2, 1))
