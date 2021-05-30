@@ -83,7 +83,7 @@ class QuestionGenerator(tf.keras.Model):
                 enc_hidden = tf.concat([enc_hidden, ans_enc_hidden], 1)
                 full_hidden = self.dim_fit_fc(enc_hidden)
                 print("full_hidden.shape", full_hidden.shape)
-                if self.decoder.num_layer > 1:
+                if self.decoder.num_layers > 1:
                     tf.split(full_hidden, self.decoder.num_layers)
                 enc_hidden = full_hidden
 
@@ -100,7 +100,7 @@ class QuestionGenerator(tf.keras.Model):
         elif training == False:
             tf.print("qg_inputs:", qg_inputs)
             if type(qg_inputs) == tf.Tensor:
-                inp = qg_inputs
+                ans_sentence = qg_inputs
             elif len(qg_inputs) == 3:
                 ans_sentence, ans_token, targ = qg_inputs
                 tf.print("targ: ", targ)
@@ -133,7 +133,7 @@ class QuestionGenerator(tf.keras.Model):
                 enc_hidden = tf.concat([enc_hidden, ans_enc_hidden], 1)
                 full_hidden = self.dim_fit_fc(enc_hidden)
                 print("full_hidden.shape", full_hidden.shape)
-                if self.decoder.num_layer > 1:
+                if self.decoder.num_layers > 1:
                     tf.split(full_hidden, self.decoder.num_layers)
                 enc_hidden = full_hidden
             
