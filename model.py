@@ -4,14 +4,18 @@ from utils import plot_attention
 
 
 class QuestionGenerator(tf.keras.Model):
-    def __init__(self, qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp, **kwargs):
+    def __init__(self, qg_dataset, inp_tokenizer, encoder, decoder, targ_tokenizer, max_length_inp, ans_encoder=None, **kwargs):
         super(QuestionGenerator, self).__init__(**kwargs)
+        self.ans_encoder = ans_encoder
         self.qg_dataset = qg_dataset
         self.inp_tokenizer = inp_tokenizer
         self.encoder = encoder
         self.decoder = decoder
         self.targ_tokenizer = targ_tokenizer
         self.max_length_inp = max_length_inp
+
+        if self.ans_encoder:
+            self.dim_fit_fc = tf.keras.layers.Dense(self.decoder.dec_units * self.decoder.num_layers)
 
     # Training
     @tf.function
@@ -45,7 +49,7 @@ class QuestionGenerator(tf.keras.Model):
         # Unpack the data
         ans_sentence, ans_token, targ = data
         # Compute predictions
-        pred = self((ans_sentence, targ), training=False, beam_width=None)
+        pred = self((ans_sentence, ans_token, targ), training=False, beam_width=None)
         #print("TEST - targ", targ[0])
         real = targ[:, 1:]
 
@@ -63,13 +67,25 @@ class QuestionGenerator(tf.keras.Model):
 
     def call(self, qg_inputs, training=False, beam_width=None):
         if training == True or beam_width == None:
-            inp, targ = qg_inputs
+            ans_sentence, ans_token, targ = qg_inputs
             # batch_sz = inp.shape[0]
             dec_input = targ[:, :-1]  # Ignore <end> token
             
             #enc_hidden = self.encoder.initialize_hidden_state(batch_sz)
             enc_output, enc_hidden = self.encoder(
-                inp, training=training)
+                ans_sentence, training=training)
+
+            if self.ans_encoder:
+                ans_enc_output, ans_enc_hidden = self.ans_encoder(
+                    ans_token, training=training)
+                print("enc_hidden.shape: ", enc_hidden.shape)
+                print("ans_enc_hidden.shape: ", ans_enc_hidden.shape)
+                enc_hidden = tf.concat([enc_hidden, ans_enc_hidden], 1)
+                full_hidden = self.dim_fit_fc(enc_hidden)
+                print("full_hidden.shape", full_hidden.shape)
+                tf.split(full_hidden, self.decoder.num_layers)
+                enc_hidden = full_hidden
+
             # Set the AttentionMechanism object with encoder_outputs
             self.decoder.attention_mechanism.setup_memory(enc_output)
 
@@ -107,6 +123,17 @@ class QuestionGenerator(tf.keras.Model):
 
             enc_out, enc_hidden = self.encoder(
                 inp, training=False)
+
+            if self.ans_encoder:
+                ans_enc_output, ans_enc_hidden = self.ans_encoder(
+                    ans_token, training=training)
+                print("enc_hidden.shape: ", enc_hidden.shape)
+                print("ans_enc_hidden.shape: ", ans_enc_hidden.shape)
+                enc_hidden = tf.concat([enc_hidden, ans_enc_hidden], 1)
+                full_hidden = self.dim_fit_fc(enc_hidden)
+                print("full_hidden.shape", full_hidden.shape)
+                tf.split(full_hidden, self.decoder.num_layers)
+                enc_hidden = full_hidden
             
             if self.encoder.bidirectional:
                 if self.decoder.num_layers==1:
