@@ -168,6 +168,8 @@ ans_sent_encoder = Encoder(vocab_inp_size, embedding_dim, units,
 if answer_enc_units > 0:
     ans_token_encoder = Encoder(vocab_inp_size, embedding_dim, answer_enc_units,
                                 bidirectional=bidirectional, embedding_matrix=inp_embedding_matrix, pretraine_embeddings=pretrained, layer=layer, dropout=dropout)
+else:
+    ans_token_encoder = None
 
 # sample input
 sample_output, sample_hidden = ans_sent_encoder(
@@ -205,7 +207,7 @@ checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_dir
                                                          )
 
 qg = QuestionGenerator(qg_dataset, inp_tokenizer, ans_sent_encoder,
-                       decoder, targ_tokenizer, max_length_inp)
+                       decoder, targ_tokenizer, max_length_inp, ans_encoder=ans_token_encoder)
 qg.compile(optimizer=optimizer, loss=loss_function)
 # qg.build(tf.TensorShape((BATCH_SIZE, max_length_inp)))
 # qg.summary()
