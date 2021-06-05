@@ -18,19 +18,20 @@ This repository contains the question generation model of my masters thesis. A n
 | utils.py      | additional functions |
 
 ### Command line arguments
-| short | long | type | default | description |
-| -d    | --dataset | str | squad | the dataset to use for training the model (squad, quac) |
-| -t    | --target_length | int | 20 | maximum length of the output questions |
-| -i    | --input_length | int | 80 | maximum length of the input sentences |
-| -x    | --vocab_input | int | 45000 | size of the vocabulary for the input sentences |
-| -y    | --max_vocab_targ | int | 28000 | size of the vocabulary for the target questions  |
-| -e    | --epochs | int | 1 | number of epochs to train the model |
-| -u    | --units | int | 600 | size of the hidden units (if a bidirectional model is used half are forward and half backward units|
-| -b    | --batch | int | 64 | batch size |
-| -l    | --layer | int | 1 | number of layers of encoder and decoder |
-| -o    | --dropout | float | 0.3 | dropout in the encoder |
-| -p    | --pretrained | bool | False | if pretraine glove wordembeddings are used |
-| -r    | --bidirectional | bool | True | if a bidirectional model is used |
-| -a    | --answer_units | int | 0 | the number of units of the answer encoder |
+| short | long             | type  | default | description |
+|-------|------------------|-------|---------|-------------|
+| -d    | --dataset        | str   | squad   | the dataset to use for training the model (squad, quac) |
+| -t    | --target_length  | int   | 20      | maximum length of the output questions |
+| -i    | --input_length   | int   | 80      | maximum length of the input sentences |
+| -x    | --vocab_input    | int   | 45000   | size of the vocabulary for the input sentences |
+| -y    | --max_vocab_targ | int   | 28000   | size of the vocabulary for the target questions  |
+| -e    | --epochs         | int   | 1       | number of epochs to train the model |
+| -u    | --units          | int   | 600     | size of the hidden units (if a bidirectional model is used half are forward and half backward units |
+| -b    | --batch          | int   | 64      | batch size |
+| -l    | --layer          | int   | 1       | number of layers of encoder and decoder |
+| -o    | --dropout        | float | 0.3     | dropout in the encoder |
+| -p    | --pretrained     | bool  | False   | if pretraine glove wordembeddings are used |
+| -r    | --bidirectional  | bool  | True    | if a bidirectional model is used |
+| -a    | --answer_units   | int   | 0       | the number of units of the answer encoder |
 
 The size of the answer units determines if a second encoder for the target answer is used.
