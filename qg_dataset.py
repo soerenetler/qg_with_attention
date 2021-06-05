@@ -12,6 +12,7 @@ class QGDataset:
     self.dev_path = data_folder + problem_type + "/question_answer/dev.csv"
     self.train_path = data_folder + problem_type + "/question_answer/train.csv"
     self.test_path = data_folder + problem_type + "/question_answer/test.csv"
+    self.test_trf_path = data_folder + problem_type + "/question_answer/trf_test.csv"
     self.inp_lang_tokenizer = None
     self.targ_lang_tokenizer = None
 

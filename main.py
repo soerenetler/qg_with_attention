@@ -255,3 +255,16 @@ for ans_sent_chunk, ans_token_chunk in zip(ans_sent_chunks, ans_token_chunks):
         for output in outputs:
             f.write(str(output))
             f.write('\n')
+
+test_trf_ans_sent, test_trf_ans_token, test_trf_questions = qg_dataset.create_dataset(qg_dataset.test_trf_path)
+ans_sent_chunks = [test_trf_ans_sent[x:x+64] for x in range(0, len(test_trf_ans_sent), 64)]
+ans_token_chunks = [test_trf_ans_token[x:x+64] for x in range(0, len(test_trf_ans_token), 64)]
+for ans_sent_chunk, ans_token_chunk in zip(ans_sent_chunks, ans_token_chunks):
+    outputs = qg.translate(ans_sent_chunk, ans_token_chunk, beam_width=3)
+
+    filename = "trf_test.txt"
+
+    with open(path_to_model + filename, "a") as f:
+        for output in outputs:
+            f.write(str(output))
+            f.write('\n')
