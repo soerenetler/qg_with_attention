@@ -269,7 +269,7 @@ for ans_sent_chunk, ans_token_chunk in zip(ans_sent_chunks, ans_token_chunks):
             f.write(str(output))
             f.write('\n')
 
-if dataset == "squad":
+if args.dataset == "squad":
     test_quac_ans_sent, test_quac_ans_token, test_quac_questions = qg_dataset.create_dataset(qg_dataset.test_quac_path)
     ans_sent_chunks = [test_quac_ans_sent[x:x+64] for x in range(0, len(test_quac_ans_sent), 64)]
     ans_token_chunks = [test_quac_ans_token[x:x+64] for x in range(0, len(test_quac_ans_token), 64)]
@@ -282,7 +282,7 @@ if dataset == "squad":
             for output in outputs:
                 f.write(str(output))
                 f.write('\n')
-elif dataset == "quac":
+elif args.dataset == "quac":
     test_squad_ans_sent, test_squad_ans_token, test_squad_questions = qg_dataset.create_dataset(qg_dataset.test_squad_path)
     ans_sent_chunks = [test_squad_ans_sent[x:x+64] for x in range(0, len(test_squad_ans_sent), 64)]
     ans_token_chunks = [test_squad_ans_token[x:x+64] for x in range(0, len(test_squad_ans_token), 64)]
