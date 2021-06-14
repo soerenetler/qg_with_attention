@@ -13,7 +13,7 @@ class QGDataset:
     self.train_path = data_folder + problem_type + "/question_answer/train.csv"
     self.test_path = data_folder + problem_type + "/question_answer/test.csv"
     self.test_trf_path = data_folder + problem_type + "/question_answer/trf_test.csv"
-    self.test_squad_path = data_folder + "/quac" + "/question_answer/test.csv"
+    self.test_squad_path = data_folder + "/squad" + "/question_answer/test.csv"
     self.test_quac_path = data_folder + "/quac" + "/question_answer/test.csv"
     self.test_tedq_path = data_folder + "/tedq" + "/question_answer/test.csv"
     self.inp_lang_tokenizer = None
