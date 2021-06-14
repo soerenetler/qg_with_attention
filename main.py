@@ -93,7 +93,7 @@ sample_answer_sentence = ['3245', 'two', 'months', 'later', 'the', 'band', 'got'
 sample_question_sentence = ['what', 'label', 'were', 'they', 'with', '?']
 sample_answer = ['spinefarm']
 
-qg_dataset = QGDataset()
+qg_dataset = QGDataset(problem_type=args.dataset)
 print(qg_dataset.preprocess_sentence(sample_answer_sentence))
 print(qg_dataset.preprocess_sentence(sample_question_sentence))
 print(qg_dataset.preprocess_sentence(sample_answer))
